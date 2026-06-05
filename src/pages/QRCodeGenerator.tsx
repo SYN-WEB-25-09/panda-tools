@@ -92,7 +92,7 @@ export default function QRCodeGenerator() {
             const { protocol, hostname, port } = window.location;
             const url = hostname === "localhost" || hostname === "127.0.0.1" 
                         ? `${protocol}//${import.meta.env.VITE_IPV4}${port ? `:${port}` : ''}`
-                        : window.location.hostname;
+                        : `${protocol}//${window.location.hostname}`;
             setFinalUrl(`${url}/r/${qrCodeId}`);
         } else {
             setFinalUrl(baseUrl);
