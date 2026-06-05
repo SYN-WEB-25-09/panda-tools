@@ -10,14 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
     "@tailwindcss/vite": "^4.3.0",
     "firebase": "^12.13.0",
     "lucide-react": "^1.16.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-hook-form": "^7.77.0",
     "react-router-dom": "^7.15.1",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
