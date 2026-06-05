@@ -85,14 +85,14 @@ export default function QRCodeGenerator() {
         fetchUniqueId();
     }, []);
 
-    console.log(window.location);
+    console.log(window.location.host);
 
     useEffect(() => {
         if (isTrackingEnabled && qrCodeId) {
             const { protocol, hostname, port } = window.location;
             const url = hostname === "localhost" || hostname === "127.0.0.1" 
                         ? `${protocol}//${import.meta.env.VITE_IPV4}${port ? `:${port}` : ''}`
-                        : window.location.pathname;
+                        : window.location.hostname;
             setFinalUrl(`${url}/r/${qrCodeId}`);
         } else {
             setFinalUrl(baseUrl);
