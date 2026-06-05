@@ -85,7 +85,7 @@ export default function QRCodeGenerator() {
         fetchUniqueId();
     }, []);
 
-    console.log(window.location.pathname);
+    console.log(window.location);
 
     useEffect(() => {
         if (isTrackingEnabled && qrCodeId) {
