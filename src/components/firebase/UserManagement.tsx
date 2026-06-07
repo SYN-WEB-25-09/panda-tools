@@ -2,41 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { useFirebaseAuth } from "../../context/FirebaseAuthContext";
 import { updateProfile, updateEmail, updatePassword } from "firebase/auth";
 import { Save, ArrowLeft, Loader2, AlertCircle, CheckCircle2, User, Mail, Lock } from "lucide-react"
-
-type ProfileFormData = {
-    username: string,
-    email: string,
-    newPassword?: string,
-    confirmPassword?: string,
-}
-
-const profileSchema: yup.ObjectSchema<ProfileFormData> = yup.object({
-    username: yup.string()
-        .trim()
-        .required("Der Nutzername ist ein Pflichtfeld und darf nicht leer sein.")
-        .min(3, "Der Nutzername muss mindestens 3 Zeichen lang sein."),
-    email: yup.string()
-        .email("Bitte gibt eine gültige E-Mai-Adresse ein.")
-        .required("Die E-Mail-Adresse ist ein Pflichtfeld."),
-    newPassword: yup.string()
-        .transform(value => value === "" ? undefined : value)
-        .min(8, "Das neue Passwort muss mindestens 8 Zeichen lang sein (NIST-Standard).")
-        .notRequired() as yup.Schema<string | undefined>,
-    confirmPassword: yup.string()
-        .transform(value => value === "" ? undefined : value)
-        .notRequired()
-        .when("newPassword", {
-            is: (val: any) => val && val.length > 0,
-            then: (schema) => schema
-                .required("Bitte wiederhole dein neues Passwort.")
-                .oneOf([yup.ref("newPassword")], "Die Passwörter stimmen nicht überein."),
-            otherwise: (schema) => schema.notRequired()
-        }) as yup.Schema<string | undefined>
-})
+import { FormInput } from "../ui/FormInput";
+import { profileSchema, ProfileFormData } from "../../schemas/profileSchema";
 
 export default function UserManagment() {
     const { user } = useFirebaseAuth();
@@ -147,63 +117,33 @@ export default function UserManagment() {
                   className="space-y-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                            Nutzername
-                        </label>
-                        <div className="relative flex items-center">
-                            <User className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                            <input type="text"
-                                required
-                                {...register("username")}
-                                className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.username ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
-                        </div>
-                        {errors.username && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.username.message}</p>}
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                            E-Mail-Adresse
-                        </label>
-                        <div className="relative flex items-center">
-                            <Mail className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                            <input type="email"
-                               required
-                               {...register("email")}
-                               className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
-                        </div>
-                        {errors.email && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.email.message}</p>}
-                    </div>
+                    <FormInput label="Nutzername"
+                               icon={User}
+                               error={errors.username?.message}
+                               {...register("username")} />
+                    <FormInput label="E-Mail-Adresse"
+                               icon={Mail}
+                               type="email"
+                               error={errors.email?.message}
+                               {...register("email")} />
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60">
-                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
-                        Passwort ändern
-                    </h3>
+                    <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">Passwort ändern (optional)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                Neues Passwort
-                            </label>
-                            <div className="relative flex items-center">
-                                <Lock className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                                <input type="password"
-                                   {...register("newPassword")}
-                                   className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.newPassword ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
-                            </div>
-                            {errors.newPassword && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.newPassword.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                                Passwort wiederholen
-                            </label>
-                            <div className="relative flex items-center">
-                                <Lock  className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                                <input type="password"
-                                   {...register("confirmPassword")}
-                                   className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.confirmPassword ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
-                            </div>
-                            {errors.confirmPassword && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.confirmPassword.message}</p>}
-                        </div>
+                        <FormInput label="Neues Passwort"
+                                   icon={Lock}
+                                   type="password"
+                                   placeholder="••••••••••••"
+                                   error={errors.newPassword?.message}
+                                   {...register("newPassword")} />
+
+                        <FormInput label="Passwort wiederholen"
+                                   icon={Lock}
+                                   type="password"
+                                   placeholder="••••••••••••"
+                                   error={errors.confirmPassword?.message}
+                                   {...register("confirmPassword")} />
                     </div>
                 </div>
 

@@ -2,46 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { LogIn, UserPlus, Loader2, AlertCircle, User, Mail, Lock } from "lucide-react";
-
-type AuthFormData = {
-    email: string;
-    password: string,
-    username?: string,
-    passwordConfirm?: string,
-}
-
-const COMMON_PASSWORDS = ["passwort123", "password123", "1234567890", "wichtig123", "qwertz123"];
-
-const authSchema: yup.ObjectSchema<AuthFormData> = yup.object({
-    email: yup.string()
-        .email("Bitte gib eine gültige E-Mail-Adresse ein.")
-        .required("E-Mail ist ein Pflichtfeld."),
-    password: yup.string()
-        .required("Passwort ist ein Pflichtfeld.")
-        .min(8, "Das Passwort muss mindestens 8 Zeichen lang sein (NIST-Standard).")
-        .test("not-common", "Dieses Passwort ist zu leicht zu erraten. Bitte wähle ein kreativeres Passwort.",
-            value => !value || !COMMON_PASSWORDS.includes(value.toLowerCase())
-        ),
-    username: yup.string().when("$isRegister", {
-        is: true,
-        then: (schema) => schema
-            .trim()
-            .required("Der Nutzername ist ein Pflichtfeld.")
-            .min(3, "Der Nutzername muss mindestens 3 Zeichen lang sein."),
-        otherwise: (schema) => schema.notRequired()
-    }),
-    passwordConfirm: yup.string().when("$isRegister", {
-        is: true,
-        then: (schema) => schema
-            .required("Bitte wiederhole dein Passwort.")
-            .oneOf([yup.ref("password")], "Die Passwörter stimmen nicht überein."),
-        otherwise: (schema) => schema.notRequired()
-    })
-}).required();
+import { FormInput } from "../ui/FormInput";
+import { authSchema, AuthFormData } from "../../schemas/authSchema";
 
 export default function FirebaseAuthPanel() {
     const navigate = useNavigate();
@@ -111,67 +76,34 @@ export default function FirebaseAuthPanel() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-stretch gap-4 w-full">
                 {isRegisterMode && (
-                    <div className="w-full">
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                            Nutzername
-                        </label>
-                        <div className="relative w-full">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                            <input type="text"
-                               {...register("username")}
-                               className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
-                               placeholder="DeinName" />
-                        </div>
-                        
-                        {errors.username && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.username.message}</p>}
-                    </div>
+                    <FormInput label="Nutzername"
+                               icon={User}
+                               placeholder="DeinName"
+                               error={errors.username?.message}
+                               {...register("username")} />
                 )}
 
-                <div className="w-full">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                        E-Mail-Adresse
-                    </label>
-                    <div className="relative w-full">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                        <input type="email"
-                           required
-                           {...register("email")}
-                           className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
-                           placeholder="beispiel@domain.de" />
-                    </div>
-                    {errors.email && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.email.message}</p>}
-                </div>
+                <FormInput label="E-Mail-Adresse"
+                           icon={Mail}
+                           type="email"
+                           placeholder="beispiel@domain.de"
+                           error={errors.email?.message}
+                           {...register("email")} />
 
-                <div className="w-full">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                        Passwort
-                    </label>
-                    <div className="relative flex items-center">
-                        <Lock className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                        <input type="password"
-                           required
-                           {...register("password")}
-                           className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
-                           placeholder="••••••••••••" />
-                    </div>
-                    {errors.password && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.password.message}</p>}
-                </div>
+                <FormInput label="Passwort"
+                           icon={Lock}
+                           type="password"
+                           placeholder="••••••••••••"
+                           error={errors.password?.message}
+                           {...register("password")} />
 
                 {isRegisterMode && (
-                    <div className="w-full">
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                            Passwort wiederholen
-                        </label>
-                        <div className="relative flex items-center">
-                            <Lock className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
-                            <input type="password"
-                                required
-                                {...register("passwordConfirm")}
-                                className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
-                                placeholder="••••••••••••" />
-                        </div>
-                        {errors.passwordConfirm && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.passwordConfirm.message}</p>}
-                    </div>
+                    <FormInput label="Passwort wiederholen"
+                               icon={Lock}
+                               type="password"
+                               placeholder="••••••••••••"
+                               error={errors.passwordConfirm?.message}
+                               {...register("passwordConfirm")} />
                 )}
 
                 <button type="submit"
