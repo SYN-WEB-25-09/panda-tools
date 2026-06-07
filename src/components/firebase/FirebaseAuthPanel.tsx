@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../../firebase/config";
 import { LogIn, UserPlus, Loader2, AlertCircle, User, Mail, Lock } from "lucide-react";
 import { FormInput } from "../ui/FormInput";
 import { authSchema, AuthFormData } from "../../schemas/authSchema";
+import { useFirebaseAuthAction } from "../../hooks/useFirebase";
 
 export default function FirebaseAuthPanel() {
-    const navigate = useNavigate();
     const [isRegisterMode, setIsRegisterMode] = useState(false);
-    const [firebaseError, setFirebaseError] = useState("");
-    const [loading, setLoading] = useState(false);
 
+    const { executeAuth, isLoading, firebaseError, clearError } = useFirebaseAuthAction();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<AuthFormData>({
         resolver: yupResolver(authSchema),
@@ -21,36 +17,12 @@ export default function FirebaseAuthPanel() {
     });
 
     const onSubmit = async (data: AuthFormData) => {
-        setFirebaseError("");
-        setLoading(true);
-
-        try {
-            if (isRegisterMode)             {
-                const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password)
-
-                await updateProfile(userCredential.user, {
-                    displayName: data.username?.trim()
-                });
-            } else {
-                await signInWithEmailAndPassword(auth, data.email, data.password);
-            }
-
-            navigate("/")
-        } catch (err: any) {
-            console.error(err);
-            if (err.code === "auth/email-already-in-use") {
-                setFirebaseError("Diese E-Mail-Adresse wird bereits verwendet.");
-            } else if (err.code === "auth/invalid-credential") {
-                setFirebaseError(err.message || "Ein Fehler ist aufgetreten.");
-            }
-        } finally {
-            setLoading(false);
-        }
+        await executeAuth(data, isRegisterMode)
     }
 
     const toggleMode = () => {
         setIsRegisterMode(!isRegisterMode);
-        setFirebaseError("");
+        clearError();
         reset();
     }
 
@@ -107,9 +79,9 @@ export default function FirebaseAuthPanel() {
                 )}
 
                 <button type="submit"
-                        disabled={loading}
+                        disabled={isLoading}
                         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-sm transition-all cursor-pointer disabled:bg-purple-400">
-                            {loading ? (
+                            {isLoading ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : isRegisterMode ? (
                                 <>
@@ -122,7 +94,7 @@ export default function FirebaseAuthPanel() {
                                     Einloggen
                                 </>
                             )}
-                        </button>
+                </button>
             </form>
 
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-center">
