@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useFirebaseAuth } from "../../context/FirebaseAuthContext";
 import { updateProfile, updateEmail, updatePassword } from "firebase/auth";
-import { Save, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Save, ArrowLeft, Loader2, AlertCircle, CheckCircle2, User, Mail, Lock } from "lucide-react"
 
 type ProfileFormData = {
     username: string,
@@ -151,20 +151,26 @@ export default function UserManagment() {
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                             Nutzername
                         </label>
-                        <input type="text"
-                               required
-                               {...register("username")}
-                               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500" />
+                        <div className="relative flex items-center">
+                            <User className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                            <input type="text"
+                                required
+                                {...register("username")}
+                                className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.username ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
+                        </div>
                         {errors.username && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.username.message}</p>}
                     </div>
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                             E-Mail-Adresse
                         </label>
-                        <input type="email"
+                        <div className="relative flex items-center">
+                            <Mail className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                            <input type="email"
                                required
                                {...register("email")}
-                               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500" />
+                               className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
+                        </div>
                         {errors.email && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.email.message}</p>}
                     </div>
                 </div>
@@ -178,18 +184,24 @@ export default function UserManagment() {
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                                 Neues Passwort
                             </label>
-                            <input type="password"
+                            <div className="relative flex items-center">
+                                <Lock className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                                <input type="password"
                                    {...register("newPassword")}
-                                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500" />
+                                   className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.newPassword ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
+                            </div>
                             {errors.newPassword && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.newPassword.message}</p>}
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                                 Passwort wiederholen
                             </label>
-                            <input type="password"
+                            <div className="relative flex items-center">
+                                <Lock  className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                                <input type="password"
                                    {...register("confirmPassword")}
-                                   className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500" />
+                                   className="`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 ${errors.confirmPassword ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`" />
+                            </div>
                             {errors.confirmPassword && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.confirmPassword.message}</p>}
                         </div>
                     </div>

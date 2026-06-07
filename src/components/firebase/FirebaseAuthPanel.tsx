@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebase/config";
-import { LogIn, UserPlus, Loader2, AlertCircle } from "lucide-react";
+import { LogIn, UserPlus, Loader2, AlertCircle, User, Mail, Lock } from "lucide-react";
 
 type AuthFormData = {
     email: string;
@@ -109,54 +109,67 @@ export default function FirebaseAuthPanel() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-stretch gap-4 w-full">
                 {isRegisterMode && (
-                    <div>
+                    <div className="w-full">
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                             Nutzername
                         </label>
-                        <input type="text"
+                        <div className="relative w-full">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                            <input type="text"
                                {...register("username")}
-                               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500"
+                               className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
                                placeholder="DeinName" />
+                        </div>
+                        
                         {errors.username && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.username.message}</p>}
                     </div>
                 )}
 
-                <div>
+                <div className="w-full">
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                         E-Mail-Adresse
                     </label>
-                    <input type="email"
+                    <div className="relative w-full">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                        <input type="email"
                            required
                            {...register("email")}
-                           className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500"
+                           className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
                            placeholder="beispiel@domain.de" />
+                    </div>
                     {errors.email && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.email.message}</p>}
                 </div>
 
-                <div>
+                <div className="w-full">
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                         Passwort
                     </label>
-                    <input type="password"
+                    <div className="relative flex items-center">
+                        <Lock className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                        <input type="password"
                            required
                            {...register("password")}
-                           className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500"
+                           className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
                            placeholder="••••••••••••" />
+                    </div>
                     {errors.password && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.password.message}</p>}
                 </div>
 
                 {isRegisterMode && (
-                    <div>
+                    <div className="w-full">
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
                             Passwort wiederholen
                         </label>
-                        <input type="password"
-                               required
-                               {...register("passwordConfirm")}
-                               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500"
-                               placeholder="••••••••••••" />
+                        <div className="relative flex items-center">
+                            <Lock className="absolute left-3 w-4 h-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                            <input type="password"
+                                required
+                                {...register("passwordConfirm")}
+                                className="`w-full min-w-full block pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-transparent text-slate-900 dark:text-slate-100 focus:outline-none focus:border-purple-500 box-border ${errors.email ? 'border-rose-500' : 'border-slate-200 dark:border-slate-800'}`"
+                                placeholder="••••••••••••" />
+                        </div>
                         {errors.passwordConfirm && <p className="text-rose-500 text-[11px] mt-1 font-medium">{errors.passwordConfirm.message}</p>}
                     </div>
                 )}
