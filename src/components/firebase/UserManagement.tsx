@@ -1,20 +1,17 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useFirebaseAuth } from "../../context/FirebaseAuthContext";
-import { updateProfile, updateEmail, updatePassword } from "firebase/auth";
 import { Save, ArrowLeft, Loader2, AlertCircle, CheckCircle2, User, Mail, Lock } from "lucide-react"
 import { FormInput } from "../ui/FormInput";
 import { profileSchema, ProfileFormData } from "../../schemas/profileSchema";
+import { useFirebaseActionProfile } from "../../hooks/useFirebase";
 
 export default function UserManagment() {
     const { user } = useFirebaseAuth();
     const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(false);
-    const [firebaseError, setFirebaseError] = useState("");
-    const [success, setSuccess] = useState("");
+    const { isLoading, profileError, successMessage, handleProfileUpdate } = useFirebaseActionProfile();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
         resolver: yupResolver(profileSchema),
@@ -41,42 +38,15 @@ export default function UserManagment() {
     }
 
     const onSubmit = async (data: ProfileFormData) => {
-        setFirebaseError("");
-        setSuccess("");
-        setLoading(true);
-
-        try {
-            if (data.username.trim() !== user.displayName){
-                await updateProfile(user, {displayName: data.username.trim() });
-            }
-
-            if (data.email.trim() !== user.email?.toLocaleLowerCase()) {
-                await updateEmail(user, data.email.trim())
-            }
-
-            if (data.newPassword) {
-               await updatePassword(user, data.newPassword)
-            }
-
+        handleProfileUpdate(user, data, () => {
             reset({
                 username: data.username,
                 email: data.email,
                 newPassword: "",
                 confirmPassword: ""
             })
-        }
-        catch (err: any) {
-            console.error(err);
-            if (err.code === "auth/requires-recent-login") {
-                setFirebaseError("Aus Sicherheitsgründen musst du dich vor dieser kritischen Änderung neu einloggen.");
-            } else{
-                setFirebaseError(err.message || "Fehler beim Aktualisieren des Profils.");
-            }
-        }
-        finally {
-            setLoading(false);
-        }
-    }
+        });
+    };
 
     return (
         <div className="w-full max-w-xl mx-auto py-6 px-4">
@@ -95,20 +65,20 @@ export default function UserManagment() {
                 </div>
             </div>
 
-            {firebaseError && (
+            {profileError && (
                 <div className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium border border-emerald-100 dark:border-emerald-900/30">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                        {firebaseError}
+                        {profileError}
                     </span>
                 </div>
             )}
 
-            {success && (
+            {successMessage && (
                 <div className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium border border-emerald-100 dark:border-emerald-900/30">
                     <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                        {success}
+                        {successMessage}
                     </span>
                 </div>
             )}
@@ -121,6 +91,7 @@ export default function UserManagment() {
                                icon={User}
                                error={errors.username?.message}
                                {...register("username")} />
+                               
                     <FormInput label="E-Mail-Adresse"
                                icon={Mail}
                                type="email"
@@ -148,9 +119,9 @@ export default function UserManagment() {
                 </div>
 
                 <button type="submit"
-                        disabled={loading}
+                        disabled={isLoading}
                         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:bg-purple-400 text-white font-semibold text-sm transition-all cursor-pointer shadow-xs">
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Änderung Speichern</>}
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Änderung Speichern</>}
                 </button>
 
             </form>

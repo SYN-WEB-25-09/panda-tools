@@ -18,10 +18,12 @@ export default function QRCodeBody({ id, url, scanCount, trackingActive, bgColor
     const baseUrl = trackingActive 
                     ? (hostname === "localhost" || hostname === "127.0.0.1" 
                         ? `${protocol}//${import.meta.env.VITE_IPV4}${port ? `:${port}` : ''}`
-                        : window.location.pathname) 
-                    : url ;
+                        : `${protocol}//${window.location.hostname}`) 
+                    : url;
 
     const qrURL = trackingActive ? (baseUrl + "/r/" + id) : baseUrl;
+
+    console.log(qrURL);
 
     const finalFgColor = fgColor || "#000000";
     

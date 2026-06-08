@@ -1,30 +1,17 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LogIn, UserPlus, Loader2, AlertCircle, User, Mail, Lock } from "lucide-react";
 import { FormInput } from "../ui/FormInput";
 import { authSchema, AuthFormData } from "../../schemas/authSchema";
-import { useFirebaseAuthAction } from "../../hooks/useFirebase";
+import { useFirebaseActionAuth } from "../../hooks/useFirebase";
 
 export default function FirebaseAuthPanel() {
-    const [isRegisterMode, setIsRegisterMode] = useState(false);
-
-    const { executeAuth, isLoading, firebaseError, clearError } = useFirebaseAuthAction();
+    const { isRegisterMode, isLoading, authError, handleAuth, toggleMode } = useFirebaseActionAuth();
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<AuthFormData>({
         resolver: yupResolver(authSchema),
         context: { isRegister: isRegisterMode }
     });
-
-    const onSubmit = async (data: AuthFormData) => {
-        await executeAuth(data, isRegisterMode)
-    }
-
-    const toggleMode = () => {
-        setIsRegisterMode(!isRegisterMode);
-        clearError();
-        reset();
-    }
 
     return (
         <div className="w-full max-w-md p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
@@ -37,16 +24,16 @@ export default function FirebaseAuthPanel() {
                 </p>
             </div>
 
-            {firebaseError && (
+            {authError && (
                 <div className="flex imtes-start gap-2 p-3 mb-4 rounded-xl bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 text-xs font-medium border border-rose-100 dark:border-rose-900/30">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                        {firebaseError}
+                        {authError}
                     </span>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-stretch gap-4 w-full">
+            <form onSubmit={handleSubmit(handleAuth)} className="flex flex-col items-stretch gap-4 w-full">
                 {isRegisterMode && (
                     <FormInput label="Nutzername"
                                icon={User}
@@ -98,7 +85,7 @@ export default function FirebaseAuthPanel() {
             </form>
 
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-center">
-                <button onClick={toggleMode}
+                <button onClick={() => toggleMode(reset)}
                         className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer">
                     {isRegisterMode ? "Bereits ein Konto? Hier einloggen" : "Noch kein Konto? Jetzt registrieren"}
                 </button>
