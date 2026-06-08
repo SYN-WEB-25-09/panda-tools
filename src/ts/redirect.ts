@@ -1,12 +1,23 @@
 import { db } from "../firebase/config"; 
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment, collection, addDoc } from "firebase/firestore";
 
 export type RedirectResult = {
     targetUrl: string;
     isShortLink: boolean;
+    trackingActive: boolean;
 }
 
-export async function processRedirect(id:string): Promise<RedirectResult> {
+export type AdvancedDeviceInfo = {
+    deviceType: string;
+    deviceBrand: string;
+    browser: string;
+    os: string;
+    country: string;
+    language: string;
+    timestamp: string;
+}
+
+export async function processRedirect(id:string, deviceInfo: AdvancedDeviceInfo): Promise<RedirectResult> {
     const isShortLink = id.length === 8;
     const collectionName = isShortLink ? "shortlinks" : "qrcodes"
     const counterFieldName = isShortLink ? "clickCount" : "scanCount";
@@ -24,6 +35,7 @@ export async function processRedirect(id:string): Promise<RedirectResult> {
 
     const data = docSnap.data();
     const targetUrl = data.url;
+    const isTrackingActive = data.trackingActive === true;
 
     if (!targetUrl) {
         throw new Error("Für diesen Eintrag wurde keine gültige Ziel-Adresse gefunden.")
@@ -31,5 +43,14 @@ export async function processRedirect(id:string): Promise<RedirectResult> {
 
     await updateDoc(docRef, {[counterFieldName]: increment(1)});
 
-    return {targetUrl, isShortLink};
+    if (isTrackingActive && deviceInfo) {
+        const analysticsSubcollectionRef = collection(db, collectionName, id, "analytics");
+        await addDoc(analysticsSubcollectionRef, deviceInfo)
+        console.log("Tracking aktiv: Device-Infos wurden im Unterdokument gespeichert.");
+    } else {
+        console.log("Tracking deaktiviert: Es wurden keine personenbezogenen Device-Infos gespeichert.");
+    }
+
+
+    return {targetUrl, isShortLink, trackingActive: isTrackingActive};
 }

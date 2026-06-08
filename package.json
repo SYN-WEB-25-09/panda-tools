@@ -20,6 +20,7 @@
     "react-hook-form": "^7.77.0",
     "react-router-dom": "^7.15.1",
     "tailwindcss": "^4.3.0",
+    "ua-parser-js": "^2.0.10",
     "yup": "^1.7.1"
   },
   "devDependencies": {
