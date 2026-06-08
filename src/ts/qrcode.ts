@@ -1,5 +1,5 @@
 import { db, storage } from "../firebase/config";
-import { collection, query, where, getDocs, doc, setDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export type QRCodeItem = {
@@ -15,6 +15,11 @@ export type QRCodeItem = {
     createdAt: string;
     createdBy: string;
 };
+
+export async function deleteQRCOdeFormDatabase(id: string): Promise<void> {
+    const docRef = doc(db, "qrcodes", id);
+    await deleteDoc(docRef);
+}
 
 const compressToWebPBlob = (base64Str: string): Promise<Blob> => {
     return new Promise((resolve, reject) => {

@@ -4,7 +4,8 @@ import { AlertCircle, Loader2, Plus, QrCode, Search, X } from "lucide-react"
 import QRCodeCard from "../components/qrcode/QRCodeCard"
 import OverviewHeader from "../components/OverviewHeader"
 import { useFirebaseAuth } from "../context/FirebaseAuthContext"
-import { useQRCodesSearch } from "../hooks/useQRCode";
+import { useQRCodesSearch, useDeleteQRCode } from "../hooks/useQRCode";
+import { number } from "yup"
 
 export default function QRCodeOverview() {
     const navigate = useNavigate();
@@ -12,13 +13,19 @@ export default function QRCodeOverview() {
 
     const [searchTerm, setSearchTerm] = useState<string>("");
 
-    const [results, error, isLoading] = useQRCodesSearch(user?.uid, searchTerm)
+    const [refetchNonce, setRefetchNonce] = useState<number>(0)
+
+    const [results, error, isLoading] = useQRCodesSearch(user?.uid, searchTerm, refetchNonce)
+
+    const { triggerDelete, isDeleting } = useDeleteQRCode();
 
     console.log(results);
 
     const handleDelete = (id:string): void => {
         if (confirm("Möchtest du diesen QR-Code wirklich löschen?")) {
-            /*setQrCordes(results.filter((code) => code.id !== id));*/
+            triggerDelete(id, () => {
+                setRefetchNonce(refetchNonce + 1);
+            });
         }
     }
 
@@ -63,11 +70,11 @@ export default function QRCodeOverview() {
                 </div>
             )}
 
-            {isLoading ? (
+            {isLoading || isDeleting ? (
                 <div className="flex flex-col items-center justify-center p-24">
                     <Loader2 className="w-8 h-8 text-purple-600 animate-spin mb-2" />
                     <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
-                        Lade deine Qr-Codes aus der Cloud...
+                        {isDeleting ? "QR-Code wird gelöscht..." : "Lade deine Qr-Codes..."}
                     </p>
                 </div>
             ) : results.length === 0 ? (

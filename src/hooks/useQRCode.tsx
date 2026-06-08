@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { fetchQRCodesByUserId, QRCodeItem, saveQRCodeToDatabase, uploadLogoToStarage } from "../ts/qrcode"
+import { deleteQRCOdeFormDatabase, fetchQRCodesByUserId, QRCodeItem, saveQRCodeToDatabase, uploadLogoToStarage } from "../ts/qrcode"
 
 type SavePayload = {
     id: string;
@@ -14,6 +14,42 @@ type SavePayload = {
     isTransparent: boolean;
     exportFormat: string;
     onSuccess: () => void;
+}
+
+export function useDeleteQRCode() {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [onSuccessCallback, setOnSuccessCallback] = useState<(() => void) | null>(null);
+
+    useEffect(() => {
+        if (!deleteId) return;
+
+        const currentDeleteId = deleteId;
+
+        async function processDelete() {
+            setIsDeleting(true);
+            try {
+                await deleteQRCOdeFormDatabase(currentDeleteId);
+                alert("QR Code erfolgreich gelöscht.")
+                if (onSuccessCallback) onSuccessCallback();
+            } catch (error) {
+                console.error("Fehler beim Löschen des QR-Codes", error);
+                alert("Fehler beim löschen des QR-Codes.")
+            } finally {
+                setIsDeleting(false);
+                setDeleteId(null);
+            }
+        }
+
+        processDelete();
+    }, [deleteId, onSuccessCallback]);
+
+    const triggerDelete = (id: string, onSuccess: () => void) => {
+        setDeleteId(id);
+        setOnSuccessCallback(() => onSuccess)
+    }
+
+    return { triggerDelete, isDeleting };
 }
 
 export function useSaveQRCode() {
@@ -84,7 +120,7 @@ export function useSaveQRCode() {
     return { triggerSave, isSaving }
 }
 
-export function useQRCodesSearch(userId: string | undefined, searchTerm: string = "") {
+export function useQRCodesSearch(userId: string | undefined, searchTerm: string = "", refetchTrigger: number = 0) {
     const [results, setResults] = useState<QRCodeItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<any>(null);
@@ -98,7 +134,6 @@ export function useQRCodesSearch(userId: string | undefined, searchTerm: string 
 
             try {
                 setIsLoading(true);
-
                 const data = await fetchQRCodesByUserId(userId);
 
                 const filteredData = data.filter(code => 
@@ -106,7 +141,6 @@ export function useQRCodesSearch(userId: string | undefined, searchTerm: string 
                     code.url.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
                 );
 
-                console.log("Geladene QR-Codes:", filteredData);
                 setResults(filteredData);
                 setError(null);
             } catch (err) {
@@ -119,7 +153,7 @@ export function useQRCodesSearch(userId: string | undefined, searchTerm: string 
         }
 
         load();
-    }, [userId, searchTerm]);
+    }, [userId, searchTerm, refetchTrigger]);
 
     return [results, error, isLoading] as const;
 }
