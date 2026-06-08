@@ -5,7 +5,6 @@ import QRCodeCard from "../components/qrcode/QRCodeCard"
 import OverviewHeader from "../components/OverviewHeader"
 import { useFirebaseAuth } from "../context/FirebaseAuthContext"
 import { useQRCodesSearch, useDeleteQRCode } from "../hooks/useQRCode";
-import { number } from "yup"
 
 export default function QRCodeOverview() {
     const navigate = useNavigate();
