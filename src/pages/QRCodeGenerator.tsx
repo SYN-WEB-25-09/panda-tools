@@ -150,7 +150,7 @@ export default function QRCodeGenerator() {
 
                     <button onClick={handleSaveToDatabase} 
                             disabled={isSaving || isIdGenerating || !qrCodeId || !user || isSaved} 
-                            className="flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:bg-purple-400 text-white font-semibold text-sm py-2.5 px-5 shadow-xs transition-all cursor-pointer dark:bg-purple-500 dark:hover:bg-purple-400 shrink-0 whitespace-nowrap sm:order-3">
+                            className="flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-800 dark:disabled:text-slate-600 text-white font-semibold text-sm py-2.5 px-5 shadow-xs transition-all cursor-pointer dark:bg-purple-500 dark:hover:bg-purple-400 shrink-0 whitespace-nowrap sm:order-3 disabled:cursor-not-allowed">
                         {isSaving 
                         ? <><Loader2 className="w-4 h-4 animate-spin" /> Wird gespeichert... </> 
                         : isIdGenerating 
