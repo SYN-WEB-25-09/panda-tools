@@ -23,6 +23,7 @@ type GeneratorFormProps = {
     logoSize: number;
     setLogoSize: (val: number) => void;
     fileInputRef: React.RefObject<HTMLInputElement | null>;
+    isUserLoggedIn: boolean;
 };
 
 export default function GeneratorForm({
@@ -34,7 +35,8 @@ export default function GeneratorForm({
     isTransparent, setIsTransparent,
     exportFormat,
     logo, handleLogoUpload, handleRemoveLogo,
-    logoSize, setLogoSize, fileInputRef
+    logoSize, setLogoSize, fileInputRef,
+    isUserLoggedIn
 }: GeneratorFormProps) {
     return (
         <div className="lg:col-span-7 flex flex-col gap-6">
@@ -48,6 +50,7 @@ export default function GeneratorForm({
             <TrackingSection 
                 isTrackingEnabled={isTrackingEnabled} 
                 setIsTrackingEnabled={setIsTrackingEnabled} 
+                isUserLoggedIn={isUserLoggedIn}
             />
             
             <StyleSection 

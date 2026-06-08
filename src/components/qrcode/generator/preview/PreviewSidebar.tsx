@@ -16,12 +16,14 @@ type PreviewSidebarProps = {
     dpiScale: number;
     setDpiScale: (val: number) => void;
     handleDownload: () => void;
+    isDownloadDisabled: boolean;
 };
 
 export default function PreviewSidebar({
     qrRef, isIdGenerating, finalUrl, isTransparent,
     exportFormat, setExportFormat, bgColor, fgColor,
-    logo, logoSize, dpiScale, setDpiScale, handleDownload
+    logo, logoSize, dpiScale, setDpiScale, handleDownload,
+    isDownloadDisabled
 }: PreviewSidebarProps) {
     return (
         <div className="lg:col-span-5 lg:sticky lg:top-6 flex flex-col items-center">
@@ -53,6 +55,7 @@ export default function PreviewSidebar({
                     handleDownload={handleDownload}
                     isIdGenerating={isIdGenerating}
                     exportFormat={exportFormat}
+                    isDownloadDisabled={isDownloadDisabled}
                 />
             </div>
         </div>

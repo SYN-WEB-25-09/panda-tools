@@ -22,7 +22,8 @@ export default function Home() {
         if (user) {
             navigate(targetPath)
         } else {
-            navigate("/login")
+            if (targetPath === "/qr-overview") navigate("/qrcode-generator")
+            else navigate("/login")
         }
     }
 

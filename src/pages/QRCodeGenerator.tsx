@@ -14,7 +14,6 @@ export default function QRCodeGenerator() {
     const { user } = useFirebaseAuth();
 
     const { unequeId: qrCodeId, isIdGenerating } = useUniqueId("qrcodes", 20);
-
     const { triggerSave, isSaving } = useSaveQRCode();
 
     const [isSaved, setIsSaved] = useState(false);
@@ -72,7 +71,6 @@ export default function QRCodeGenerator() {
 
         triggerSave({id: qrCodeId, userId: user.uid, title, baseUrl, bgColor, fgColor, image, imageSize, isTrackingEnabled, isTransparent, exportFormat, onSuccess: () => {
             setIsSaved(true);
-            navigate("/qr-overview")
         }})
     };
 
@@ -151,7 +149,7 @@ export default function QRCodeGenerator() {
                     </button>
 
                     <button onClick={handleSaveToDatabase} 
-                            disabled={isSaving || isIdGenerating || !qrCodeId} 
+                            disabled={isSaving || isIdGenerating || !qrCodeId || !user || isSaved} 
                             className="flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:bg-purple-400 text-white font-semibold text-sm py-2.5 px-5 shadow-xs transition-all cursor-pointer dark:bg-purple-500 dark:hover:bg-purple-400 shrink-0 whitespace-nowrap sm:order-3">
                         {isSaving 
                         ? <><Loader2 className="w-4 h-4 animate-spin" /> Wird gespeichert... </> 
@@ -172,12 +170,14 @@ export default function QRCodeGenerator() {
                                isTransparent={isTransparent} setIsTransparent={setIsTransparent}
                                exportFormat={exportFormat}
                                logo={image} handleLogoUpload={handleLogoUpload} handleRemoveLogo={handleRemoveLogo}
-                               logoSize={imageSize} setLogoSize={setImageSize} fileInputRef={fileInputRef} />
+                               logoSize={imageSize} setLogoSize={setImageSize} fileInputRef={fileInputRef}
+                               isUserLoggedIn={!!user} />
 
                 <PreviewSidebar qrRef={qrRef} isIdGenerating={isIdGenerating} finalUrl={finalUrl}
                                 isTransparent={isTransparent} exportFormat={exportFormat} setExportFormat={setExportFormat}
                                 bgColor={bgColor} fgColor={fgColor} logo={image} logoSize={imageSize}
-                                dpiScale={dpiScale} setDpiScale={setDpiScale} handleDownload={handleDownload} />
+                                dpiScale={dpiScale} setDpiScale={setDpiScale} handleDownload={handleDownload}
+                                isDownloadDisabled={isTrackingEnabled && !isSaved} />
             </div>
         </div>
     )
