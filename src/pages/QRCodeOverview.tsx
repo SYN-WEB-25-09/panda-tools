@@ -4,7 +4,7 @@ import { AlertCircle, Loader2, Plus, QrCode, Search, X } from "lucide-react"
 import QRCodeCard from "../components/qrcode/QRCodeCard"
 import OverviewHeader from "../components/OverviewHeader"
 import { useFirebaseAuth } from "../context/FirebaseAuthContext"
-import { useQRCodesSearch } from "../hooks/useQRCodeSearch";
+import { useQRCodesSearch } from "../hooks/useQRCode";
 
 export default function QRCodeOverview() {
     const navigate = useNavigate();
@@ -92,7 +92,7 @@ export default function QRCodeOverview() {
                                     createdAt={code.createdAt}
                                     bgColor={code.bgColor}
                                     fgColor={code.fgColor}
-                                    image={code.image}
+                                    image={code.image || ""}
                                     imageSize={code.imageSize}
                                     onDelete={() => handleDelete(code.id ?? "")} />
                     ))}

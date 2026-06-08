@@ -5,85 +5,36 @@ import { ArrowLeft, Sparkles, Save, Loader2 } from "lucide-react";
 import GeneratorForm from "../components/qrcode/generator/form/GeneratorForm";
 import PreviewSidebar from "../components/qrcode/generator/preview/PreviewSidebar";
 
-import { db, storage } from "../firebase/config";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage"
 import { useFirebaseAuth } from "../context/FirebaseAuthContext";
+import { useUniqueId } from "../hooks/useUniqueId";
+import { useSaveQRCode } from "../hooks/useQRCode";
 
 export default function QRCodeGenerator() {
     const navigate = useNavigate();
     const { user } = useFirebaseAuth();
 
-    const [qrCodeId, setQRCodeId] = useState("")
-    const [isIdGenerating, setIsIdGenerating] = useState(true);
+    const { unequeId: qrCodeId, isIdGenerating } = useUniqueId("qrcodes", 20);
+
+    const { triggerSave, isSaving } = useSaveQRCode();
+
+    const [isSaved, setIsSaved] = useState(false);
 
     const [title, setTitle] = useState("");
     const [baseUrl, setBaseUrl] = useState("");
     const [finalUrl, setFinalUrl] = useState("");
-
-    const [isSaving, setIsSaving] = useState(false);
 
     const [isTrackingEnabled, setIsTrackingEnabled] = useState(false);
 
     const [fgColor, setFgColor] = useState("#000000");
     const [bgColor, setBgColor] = useState("#ffffff");
     const [isTransparent, setIsTransparent] = useState(false);
-    const [logo, setLogo] = useState("")
-    const [logoSize, setLogoSize] = useState(44);
+    const [image, setImage] = useState("")
+    const [imageSize, setImageSize] = useState(44);
     const [exportFormat, setExportFormat] = useState("PNG");
     const [dpiScale, setDpiScale] = useState(4);
 
     const qrRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const generateCustomId = (): string => {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = ""
-
-        const randomValues = new Uint32Array(20)
-        window.crypto.getRandomValues(randomValues)
-
-        for (let i = 0; i < 20; i++) {
-            result += chars.charAt(randomValues[i] % chars.length);
-        }
-
-        return result;
-    };
-
-    useEffect(() => {
-        const fetchUniqueId = async () => {
-            try {
-                setIsIdGenerating(true);
-                let uniqueId = "";
-                let isUsed = true;
-                let attempts = 0;
-
-                while (isUsed && attempts < 10) {
-                    uniqueId = generateCustomId()
-                    const docRef = doc(db, "qrcodes", uniqueId);
-                    const docSnap = await getDoc(docRef)
-
-                    if (!docSnap.exists()) {
-                        isUsed = false;
-                    }
-                    attempts++;
-                }
-
-                if (isUsed) {
-                    throw new Error("Kollisionsfehler: Es konnte keine freie ID ermittlet werden.")
-                }
-
-                setQRCodeId(uniqueId)
-            } catch (error) {
-                console.error("Fehler bei der ID-Validierung:", error);
-                alert("Fehler beim Initialisieren des QR-Codes. Bitte lade die Seite neu.");
-            } finally {
-                setIsIdGenerating(false);
-            }
-        }
-
-        fetchUniqueId();
-    }, []);
 
     useEffect(() => {
         if (isTrackingEnabled && qrCodeId) {
@@ -102,119 +53,27 @@ export default function QRCodeGenerator() {
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
-                if (event.target?.result) setLogo(event.target.result as string)
+                if (event.target?.result) setImage(event.target.result as string);
             };
-            
             reader.readAsDataURL(file);
         }
     };
 
     const handleRemoveLogo = () => {
-        setLogo("")
+        setImage("")
         if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-
-    const compressToWebPBlop = (base64Str: string): Promise<Blob> => {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = base64Str;
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                let width = img.width;
-                let height = img.height;
-                const maxSide = 150;
-
-                if (width > height) {
-                    if (width > maxSide) {
-                        height = Math.round((height * maxSide) / width);
-                        width = maxSide;
-                    }
-                } else {
-                    if (height > maxSide) {
-                        width = Math.round((width * maxSide) / height);
-                        height = maxSide;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext("2d");
-                if (!ctx) {
-                    reject(new Error("Canvas-Context konnte nicht erstellt werden."))
-                }
-
-                ctx?.drawImage(img, 0, 0, width, height);
-
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        resolve(blob);
-                    } else {
-                        reject(new Error("Konvertierung in WebP fehlgeschlagen"))
-                    }
-                }, "image/wbp", 0.85);
-            };
-            img.onerror = (err) => reject(err);
-        });
-    };
-
-    const uploadLogoToStorage = async (id: string, base64Logo: string): Promise<string> => {
-        const webpBlob = await compressToWebPBlop(base64Logo);
-        const fileRef = storageRef(storage, `logos/${id}.webp`)
-
-        await uploadBytes(fileRef, webpBlob, { contentType: "image/webp" });
-
-        return await getDownloadURL(fileRef);
     }
 
     const handleSaveToDatabase = async () => {
         if (!user) {
-            alert("Du muss eingeloggt sein, um QR-Codes zu speichern.");
+            alert ("Du musst eingeloggt sein, um QR-Codes zu Speichern.");
             return;
         }
 
-        if (!baseUrl || baseUrl === "https://example.com") {
-            alert("Bitte gibt eine gültige Ziel-URL ein.")
-            return;
-        }
-
-        if (!qrCodeId) {
-            alert("Die ID wird noch generiert. Bitte kurz warten.");
-            return;
-        }
-
-        try {
-            setIsSaving(true);
-
-            let finalLogoUrl: string | null = null;
-
-            if (logo) {
-                finalLogoUrl = await uploadLogoToStorage(qrCodeId, logo)
-            }
-
-            const qrCodeData = {
-                title: title.trim() || "",
-                url: baseUrl,
-                bgColor: isTransparent && exportFormat !== "JPG" ? "transparent" : bgColor,
-                fgColor: fgColor,
-                image: finalLogoUrl,
-                imageSize: logoSize,
-                trackingActive: isTrackingEnabled,
-                scanCount: 0,
-                createdAt: new Date().toLocaleDateString("de-DE"),
-                createdBy: user.uid,
-            };
-
-            await setDoc(doc(db, "qrcodes", qrCodeId), qrCodeData);
-
-            alert("QR-Code erfolgreich gespeichert!");
-            navigate("/qr-overview");
-        } catch (error) {
-            console.error("Fehler beim Speichern in Firestore:", error)
-            alert("Fehler beim Speichern des QR-Codes.")
-        } finally {
-            setIsSaving(false);
-        }
+        triggerSave({id: qrCodeId, userId: user.uid, title, baseUrl, bgColor, fgColor, image, imageSize, isTrackingEnabled, isTransparent, exportFormat, onSuccess: () => {
+            setIsSaved(true);
+            navigate("/qr-overview")
+        }})
     };
 
     const triggerDownload = (url: string, fileName: string) => {
@@ -227,6 +86,11 @@ export default function QRCodeGenerator() {
     };
 
     const handleDownload = () => {
+        if (isTrackingEnabled && !isSaved) {
+            alert("Dieser QR-Code nutzt Tracking, Bitte speichere ihn zuerst, um den Download freizuschalten.")
+            return;
+        }
+
         const svgElement = qrRef.current?.querySelector("svg");
         if (!svgElement) return;
 
@@ -307,12 +171,12 @@ export default function QRCodeGenerator() {
                                bgColor={bgColor} setBgColor={setBgColor}
                                isTransparent={isTransparent} setIsTransparent={setIsTransparent}
                                exportFormat={exportFormat}
-                               logo={logo} handleLogoUpload={handleLogoUpload} handleRemoveLogo={handleRemoveLogo}
-                               logoSize={logoSize} setLogoSize={setLogoSize} fileInputRef={fileInputRef} />
+                               logo={image} handleLogoUpload={handleLogoUpload} handleRemoveLogo={handleRemoveLogo}
+                               logoSize={imageSize} setLogoSize={setImageSize} fileInputRef={fileInputRef} />
 
                 <PreviewSidebar qrRef={qrRef} isIdGenerating={isIdGenerating} finalUrl={finalUrl}
                                 isTransparent={isTransparent} exportFormat={exportFormat} setExportFormat={setExportFormat}
-                                bgColor={bgColor} fgColor={fgColor} logo={logo} logoSize={logoSize}
+                                bgColor={bgColor} fgColor={fgColor} logo={image} logoSize={imageSize}
                                 dpiScale={dpiScale} setDpiScale={setDpiScale} handleDownload={handleDownload} />
             </div>
         </div>

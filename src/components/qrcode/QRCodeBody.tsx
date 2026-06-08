@@ -23,8 +23,6 @@ export default function QRCodeBody({ id, url, scanCount, trackingActive, bgColor
 
     const qrURL = trackingActive ? (baseUrl + "/r/" + id) : baseUrl;
 
-    console.log(qrURL);
-
     const finalFgColor = fgColor || "#000000";
     
     const finalBgColor = (!bgColor || bgColor === "transparent") ? "#ffffff" : bgColor;
