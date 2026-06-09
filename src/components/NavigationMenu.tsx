@@ -17,7 +17,7 @@ export default function NavigationMenu() {
 
     if (user) {
         menuLinks.push(
-            { target: "/qr-overview", displayName: "QR-Code", icon: QrCode },
+            { target: "/qrcode", displayName: "QR-Code", icon: QrCode },
             { target: "/short-link", displayName: "Short-Link", icon: Link2 },
         );
     }

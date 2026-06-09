@@ -16,13 +16,11 @@ export default function Home() {
     const navigate = useNavigate();
     const { user } = useFirebaseAuth();
 
-    console.log(user);
-
     const handleToolNagivation = (targetPath: string) => {
         if (user) {
             navigate(targetPath)
         } else {
-            if (targetPath === "/qr-overview") navigate("/qrcode-generator")
+            if (targetPath === "/qrcode") navigate("/qrcode-generator")
             else navigate("/login")
         }
     }
@@ -34,7 +32,7 @@ export default function Home() {
             description: 'Erstelle im Handumdrehen anpassbare QR-Codes für Links, Texte oder WLAN-Zugänge.',
             icon: QrCode,
             color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-            action: () => handleToolNagivation('/qr-overview'),
+            action: () => handleToolNagivation('/qrcode'),
         },
         {
             id: 'short-link',

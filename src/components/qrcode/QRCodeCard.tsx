@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import QRCodeHeader from "./QRCodeHeader";
 import QRCodeBody from "./QRCodeBody";
 
@@ -16,8 +17,11 @@ type QRCodeCardProps = {
 }
 
 export default function QRCodeCard({ id, title, url, scanCount, trackingActive, createdAt, bgColor, fgColor, image, imageSize, onDelete }: QRCodeCardProps) {
+    const navigate = useNavigate();
+
     return (
-        <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 transition-all hover:border-slate-300 dark:hover:border-slate-700">
+        <div onClick={() => navigate(`/qrcode/${id}`)}
+             className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 transition-all hover:border-purple-500/50 dark:hover:border-purple-500/50 hover:shadow-md cursor-pointer group">
         <QRCodeHeader title={title}
                       createdAt={createdAt}
                       onDelete={onDelete} />

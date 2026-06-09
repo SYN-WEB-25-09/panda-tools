@@ -1,6 +1,7 @@
 import { db, storage } from "../firebase/config";
-import { collection, query, where, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, getDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { AdvancedDeviceInfo } from "./redirect";
 
 export type QRCodeItem = {
     id: string;
@@ -15,6 +16,55 @@ export type QRCodeItem = {
     createdAt: string;
     createdBy: string;
 };
+
+export async function fetchQRCodeById(id: string): Promise<QRCodeItem | null> {
+    const docRef = doc(db, "qrcodes", id);
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return null;
+
+    const data = docSnap.data();
+	if (!data) return null;
+	
+    const analytics = await fetchQRCodeAnalytics(id);
+
+    return {
+        id: docSnap.id,
+        title: data.title,
+        url: data.url,
+        bgColor: data.bgColor,
+        fgColor: data.fgColor,
+        image: data.image,
+        imageSize: data.imageSize,
+        trackingActive: data.trackingActive,
+        scanCount: analytics.length,
+        createdAt: data.createdAt,
+        createdBy: data.createdBy,
+    } as QRCodeItem;
+}
+
+export async function fetchQRCodeAnalytics(id: string): Promise<AdvancedDeviceInfo[]> {
+    try {
+        const analyticsSnapshot = await getDocs(collection(db, "qrcodes", id, "analytics"));
+        
+        // Wenn keine Dokumente da sind (z.B. neu erstellt), direkt leeres Array zurückgeben
+        if (!analyticsSnapshot || analyticsSnapshot.empty) {
+            return [];
+        }
+
+        const records: AdvancedDeviceInfo[] = [];
+        analyticsSnapshot.forEach((docSnap) => {
+            if (docSnap.exists()) {
+                records.push(docSnap.data() as AdvancedDeviceInfo);
+            }
+        });
+
+        return records;
+    } catch (error) {
+        console.warn(`Keine Analytics für QR-Code ${id} gefunden oder Zugriff verweigert:`, error);
+        return [];
+    }
+}
 
 export async function deleteQRCOdeFormDatabase(id: string): Promise<void> {
     const docRef = doc(db, "qrcodes", id);
@@ -66,7 +116,7 @@ export async function  uploadLogoToStarage(id: string, base64Logo: string): Prom
     return await getDownloadURL(fileRef);
 }
 
-export async function saveQRCodeToDatabase(id: string, qrCodeData: Omit<QRCodeItem, "id">): Promise<void> {
+export async function saveQRCodeToDatabase(id: string, qrCodeData: Omit<QRCodeItem, "id" | "scanCount">): Promise<void> {
     await setDoc(doc(db, "qrcodes", id), qrCodeData);
 }
 
@@ -77,23 +127,28 @@ export async function fetchQRCodesByUserId(userId: string): Promise<QRCodeItem[]
     );
 
     const querySnapshot = await getDocs(q);
-    const qrCodes: QRCodeItem[] = [];
 
-    querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        qrCodes.push({
-            id: docSnap.id,
-            title: data.title,
-            url: data.url,
-            bgColor: data.bgColor,
-            fgColor: data.fgColor,
-            image: data.image,
-            trackingActive: data.trackingActive,
-            scanCount: data.scanCount || 0,
-            createdAt: data.createdAt,
-            createdBy: data.createdBy,
-        });
-    });
+    const qrCodes: QRCodeItem[] = await Promise.all(
+            querySnapshot.docs.map(async (docSnap) => {
+                const data = docSnap.data();
+                
+                const analytics = await fetchQRCodeAnalytics(docSnap.id);
+
+                return {
+                    id: docSnap.id,
+                    title: data.title || "Unbenannt",
+                    url: data.url || "",
+                    bgColor: data.bgColor || "#ffffff",
+                    fgColor: data.fgColor || "#000000",
+                    image: data.image || null,
+                    imageSize: data.imageSize,
+                    trackingActive: !!data.trackingActive,
+                    scanCount: analytics.length, // Ist nun garantiert 0 bei neuen QR-Codes
+                    createdAt: data.createdAt || "",
+                    createdBy: data.createdBy || "",
+                };
+            })
+        );
 
     return qrCodes;
 }
