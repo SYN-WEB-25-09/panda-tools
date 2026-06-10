@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Smartphone, Compass, Globe, Laptop, Eye, Calendar, Cpu, Languages, Download, Check } from "lucide-react"
 import { fetchQRCodeById, fetchQRCodeAnalytics, QRCodeItem } from "../ts/qrcode";
@@ -8,6 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 export default function QRCodeDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const qrRef = useRef<HTMLDivElement | null>(null);
 
     const [qrCode, setQrCode] = useState<QRCodeItem | null>(null);
     const [analytics, setAnalytics] = useState<AdvancedDeviceInfo[]>([]);
@@ -15,6 +16,7 @@ export default function QRCodeDetail() {
     const [exportFormat, setExportFormat] = useState<string>("PNG");
     const [dpiScale, setDpiScale] = useState<number>(4);
     const [isTransparent, setIsTransparent] = useState<boolean>(false);
+    const [finalUrl, setFinalUrl] = useState<string>("");
 
     useEffect(() => {
         if (!id) return;
@@ -37,79 +39,114 @@ export default function QRCodeDetail() {
         loadDetail();
     }, [id]);
 
-    const handleDownload = () => {
-        const svgElement = document.getElementById("qr-code-svg");
-        if (!svgElement) return;
+    useEffect(() => {
+        if (!qrCode) return;
 
-        // Falls transparente SVGs gewünscht sind, manipulieren wir kurz das SVG-Attribut für den Download
-        const originalBg = svgElement.getAttribute("style");
-        if (exportFormat === "SVG" && isTransparent) {
-            // Findet das Hintergrund-Rechteck im generierten SVG und macht es transparent
-            const bgRect = svgElement.querySelector("rect");
-            if (bgRect) bgRect.setAttribute("fill", "transparent");
+        if (qrCode.trackingActive) {
+            const { protocol, hostname, port } = window.location;
+            const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+            
+            const domain = isLocal
+                ? `${protocol}//${import.meta.env.VITE_IPV4 || hostname}${port ? `:${port}` : ''}`
+                : `${protocol}//${hostname}`;
+                
+            setFinalUrl(`${domain}/r/${qrCode.id}`);
+        } else {
+            setFinalUrl(qrCode.url);
+        }
+    }, [qrCode]);
+
+    const triggerDownload = (url: string, filename: string) => {
+        const downloadLink = document.createElement("a");
+        downloadLink.href = url;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    };
+
+    const handleDownload = () => {
+        const svgElement = qrRef.current?.querySelector("svg");
+        if (!svgElement || !qrCode) return;
+
+        const currentBgColor = qrCode.bgColor || "#ffffff";
+        const filenameBase = (qrCode.title || "qrcode").toLowerCase().replace(/\s+/g, '_');
+
+        if (exportFormat === "SVG") {
+            const originalBg = svgElement.getAttribute("style");
+            if (isTransparent) {
+                const bgRect = svgElement.querySelector("rect");
+                if (bgRect) bgRect.setAttribute("fill", "transparent");
+            }
+
+            const svgData = new XMLSerializer().serializeToString(svgElement);
+            const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+            const svgUrl = URL.createObjectURL(svgBlob);
+
+            triggerDownload(svgUrl, `${filenameBase}.svg`);
+            URL.revokeObjectURL(svgUrl);
+            if (originalBg) svgElement.setAttribute("style", originalBg);
+            return;
         }
 
-        const svgString = new XMLSerializer().serializeToString(svgElement);
-        const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
         const svgUrl = URL.createObjectURL(svgBlob);
 
-        // Fall 1: Reiner SVG Export (Vektorgrafik)
-        if (exportFormat === "SVG") {
-            const downloadLink = document.createElement("a");
-            downloadLink.href = svgUrl;
-            downloadLink.download = `${qrCode?.title || "qrcode"}.svg`;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-            URL.revokeObjectURL(svgUrl);
-            
-            // UI-Zustand des SVGs auf der Seite wiederherstellen, falls manipuliert
-            if (originalBg) svgElement.setAttribute("style", originalBg);
-        } else {
-            // Fall 2: Rastergrafiken (PNG / JPG) mit DPI Skalierung
-            const image = new Image();
-            image.onload = () => {
-                const baseSize = 256; 
-                const targetSize = baseSize * dpiScale;
+        const qrImage = new Image();
+        qrImage.onload = () => {
+            const baseSize = 256;
+            const targetSize = baseSize * dpiScale;
 
-                const canvas = document.createElement("canvas");
-                canvas.width = targetSize;
-                canvas.height = targetSize;
-                const context = canvas.getContext("2d");
+            const canvas = document.createElement("canvas");
+            canvas.width = targetSize;
+            canvas.height = targetSize;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
 
-                if (context) {
-                    // JPG erzwingt immer Weiß (da keine Transparenz möglich)
-                    if (exportFormat === "JPG") {
-                        context.fillStyle = "#ffffff";
-                        context.fillRect(0, 0, targetSize, targetSize);
-                    } else if (isTransparent) {
-                        // PNG Transparent: Canvas leeren
-                        context.clearRect(0, 0, targetSize, targetSize);
-                    } else {
-                        // PNG mit Farbe: Hintergrund aus den QR-Code-Daten füllen
-                        context.fillStyle = qrCode?.bgColor === "transparent" ? "#ffffff" : (qrCode?.bgColor || "#ffffff");
-                        context.fillRect(0, 0, targetSize, targetSize);
-                    }
+            if (exportFormat === "JPG" || !isTransparent) {
+                ctx.fillStyle = (exportFormat === "JPG" && isTransparent) ? "#ffffff" : currentBgColor;
+                ctx.fillRect(0, 0, targetSize, targetSize);
+            } else {
+                ctx.clearRect(0, 0, targetSize, targetSize);
+            }
 
-                    // QR-Code gestochen scharf zeichnen
-                    context.drawImage(image, 0, 0, targetSize, targetSize);
-                    
-                    const mimeType = exportFormat === "JPG" ? "image/jpeg" : "image/png";
-                    const quality = exportFormat === "JPG" ? 0.92 : undefined;
+            ctx.drawImage(qrImage, 0, 0, targetSize, targetSize);
 
-                    const url = canvas.toDataURL(mimeType, quality);
-                    const downloadLink = document.createElement("a");
-                    downloadLink.href = url;
-                    downloadLink.download = `${qrCode?.title || "qrcode"}.${exportFormat.toLowerCase()}`;
-                    
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
-                }
+            if (qrCode.image) {
+                const logoImage = new Image();
+                logoImage.crossOrigin = "anonymous";
+                logoImage.onload = () => {
+                    const calculatedLogoSize = (qrCode.imageSize || 40) * (targetSize / 220);
+                    const position = (targetSize - calculatedLogoSize) / 2;
+
+                    ctx.fillStyle = (exportFormat === "JPG" || !isTransparent) ? currentBgColor : "#ffffff";
+                    ctx.fillRect(position, position, calculatedLogoSize, calculatedLogoSize);
+
+                    ctx.drawImage(logoImage, position, position, calculatedLogoSize, calculatedLogoSize);
+
+                    executeCanvasExport(canvas, filenameBase, targetSize);
+                    URL.revokeObjectURL(svgUrl);
+                };
+                logoImage.onerror = () => {
+                    executeCanvasExport(canvas, filenameBase, targetSize);
+                    URL.revokeObjectURL(svgUrl);
+                };
+                logoImage.src = qrCode.image ?? "";
+                console.log(logoImage.src);
+            } else {
+                executeCanvasExport(canvas, filenameBase, targetSize);
                 URL.revokeObjectURL(svgUrl);
-            };
-            image.src = svgUrl;
-        }
+            }
+        };
+        qrImage.src = svgUrl;
+    };
+
+    const executeCanvasExport = (canvas: HTMLCanvasElement, filename: string, size: number) => {
+        const mimeType = exportFormat === "JPG" ? "image/jpeg" : "image/png";
+        const quality = exportFormat === "JPG" ? 0.95 : undefined;
+        const imgUrl = canvas.toDataURL(mimeType, quality);
+        triggerDownload(imgUrl, `${filename}-${size}px.${exportFormat.toLowerCase()}`);
     };
 
     if (loading) {
@@ -158,10 +195,8 @@ export default function QRCodeDetail() {
                 <ArrowLeft className="w-4 h-4" /> Zurück zur Übersicht
             </button>
 
-            {/* OBERER BEREICH: Stammdaten und QR-Code */}
             <div className="grid gap-6 sm:grid-cols-2 items-stretch mb-6">
                 
-                {/* STAMMDATEN CARD */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between h-full">
                     <div>
                         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50 mb-4">Stammdaten (Schreibgeschützt)</h3>
@@ -181,50 +216,65 @@ export default function QRCodeDetail() {
                         </div>
                     </div>
 
-                    {/* Scan Count & Datum */}
                     <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2 text-xs text-slate-400">
                             <Calendar className="w-4 h-4" /> Erstellt am {qrCode.createdAt}
                         </div>
-                        <div className="flex items-center gap-2 bg-purple-500/10 dark:bg-purple-500/20 px-3 py-1.5 rounded-xl">
-                            <Eye className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                            <span className="text-xs font-bold text-purple-700 dark:text-purple-300">Scans: {totalScans}</span>
+                        
+                        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl ${
+                            qrCode.trackingActive 
+                                ? "bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300" 
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                        }`}>
+                            <Eye className={`w-4 h-4 ${qrCode.trackingActive ? "text-purple-600 dark:text-purple-400" : "text-slate-400 dark:text-slate-500"}`} />
+                            <span className="text-xs font-bold">
+                                {qrCode.trackingActive ? `Scans: ${totalScans}` : "INAKTIV"}
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                {/* QR-CODE & DOWNLOAD CARD */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between h-full">
                     
-                    {/* QR-Code Live-Vorschau Bereich */}
                     <div className="flex-1 flex items-center justify-center py-2">
-                        {/* CSS-Schachbrettmuster wird hier bei gesetzter Transparenz dynamisch injiziert */}
                         <div 
-                            className="p-4 rounded-2xl shadow-xs border border-slate-100 dark:border-slate-950 transition-all"
-                            style={
-                                isTransparent 
-                                    ? {
-                                        backgroundImage: "linear-gradient(45deg, #efefef 25%, transparent 25%), linear-gradient(-45deg, #efefef 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #efefef 75%), linear-gradient(-45deg, transparent 75%, #efefef 75%)",
-                                        backgroundSize: "16px 16px",
-                                        backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
-                                        backgroundColor: "#ffffff"
-                                      }
-                                    : { backgroundColor: "#ffffff" }
-                            }
+                            className="p-6 rounded-xl shadow-xs border border-slate-200/60 dark:border-slate-800 bg-white flex items-center justify-center relative overflow-hidden"
+                            style={{
+                                backgroundImage: (isTransparent && exportFormat !== "JPG")
+                                    ? 'linear-gradient(45deg, #e2e8f0 25%, transparent 25%), linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e2e8f0 75%), linear-gradient(-45deg, transparent 75%, #e2e8f0 75%)' 
+                                    : 'none',
+                                backgroundSize: "16px 16px"
+                            }}
                         >
-                            <QRCodeSVG 
-                                id="qr-code-svg"
-                                value={qrCode.trackingActive ? `${window.location.protocol}//${window.location.hostname}/r/${qrCode.id}` : qrCode.url}
-                                size={160}
-                                // Wenn Transparent aktiv ist, rendern wir den SVG-Hintergrund transparent
-                                bgColor={isTransparent ? "transparent" : (qrCode.bgColor === "transparent" ? "#ffffff" : (qrCode.bgColor || "#ffffff"))}
-                                fgColor={qrCode.fgColor || "#000000"}
-                                level="H"
-                            />
+                            <div 
+                                ref={qrRef} 
+                                className={`p-4 rounded-lg max-w-full flex items-center justify-center ${
+                                    isTransparent && exportFormat !== 'JPG' ? 'bg-transparent' : 'bg-white'
+                                }`}
+                            >
+                                <div className="w-full max-w-55 aspect-square [&>svg]:w-full [&>svg]:h-auto">
+                                    <QRCodeSVG 
+                                        value={finalUrl || qrCode.url} 
+                                        size={220} 
+                                        bgColor={(isTransparent && exportFormat !== "JPG") ? "transparent" : (qrCode.bgColor || "#ffffff")} 
+                                        fgColor={qrCode.fgColor || "#000000"} 
+                                        level="H" 
+                                        includeMargin={true} 
+                                        imageSettings={qrCode.image 
+                                            ? { 
+                                                src: qrCode.image, 
+                                                height: qrCode.imageSize || 40, 
+                                                width: qrCode.imageSize || 40, 
+                                                excavate: true 
+                                              } 
+                                            : undefined
+                                        } 
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Download-Optionen & Formatwähler */}
                     <div className="w-full border-t border-slate-100 dark:border-slate-800/60 pt-4 mt-2">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left mb-3">
                             <div className="flex flex-col gap-1">
@@ -274,7 +324,6 @@ export default function QRCodeDetail() {
                             </div>
                         </div>
 
-                        {/* TRANSPARENZ CHECKBOX */}
                         {exportFormat !== "JPG" && (
                             <div className="mb-4 flex items-center">
                                 <label className="relative flex items-center gap-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300 cursor-pointer select-none">
@@ -303,7 +352,6 @@ export default function QRCodeDetail() {
                 </div>
             </div>
 
-            {/* UNTERER BEREICH: TRACKING STATISTIKEN */}
             <div className="w-full">
                 {!qrCode.trackingActive ? (
                     <div className="bg-slate-100 dark:bg-slate-900/40 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-400 text-xs">

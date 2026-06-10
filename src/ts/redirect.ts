@@ -1,5 +1,5 @@
 import { db } from "../firebase/config"; 
-import { doc, getDoc, updateDoc, increment, collection, addDoc } from "firebase/firestore";
+import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 
 export type RedirectResult = {
     targetUrl: string;
@@ -20,7 +20,6 @@ export type AdvancedDeviceInfo = {
 export async function processRedirect(id:string, deviceInfo: AdvancedDeviceInfo): Promise<RedirectResult> {
     const isShortLink = id.length === 8;
     const collectionName = isShortLink ? "shortlinks" : "qrcodes"
-    const counterFieldName = isShortLink ? "clickCount" : "scanCount";
 
     const docRef = doc(db, collectionName, id);
     const docSnap = await getDoc(docRef);
@@ -40,8 +39,6 @@ export async function processRedirect(id:string, deviceInfo: AdvancedDeviceInfo)
     if (!targetUrl) {
         throw new Error("Für diesen Eintrag wurde keine gültige Ziel-Adresse gefunden.")
     }
-
-    await updateDoc(docRef, {[counterFieldName]: increment(1)});
 
     if (isTrackingActive && deviceInfo) {
         const analysticsSubcollectionRef = collection(db, collectionName, id, "analytics");

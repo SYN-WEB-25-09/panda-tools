@@ -53,12 +53,18 @@ export default function QRCodeBody({ id, url, scanCount, trackingActive, bgColor
                     title="{url}">
                     {url}
                 </span>
-                <div className="flex items-center gap-1.5 bg-purple-500/10 dark:bg-purple-500/20 px-2.5 py-1 rounded-md">
-                    <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-                        Scans:
-                    </span>
-                    <span className="text-xs font-bold text-purple-700 dark:text-purple-300">
-                        {scanCount}
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md ${
+                        trackingActive 
+                            ? "bg-purple-500/10 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300" 
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                    }`}>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                            trackingActive ? "text-purple-600 dark:text-purple-400" : "text-slate-400 dark:text-slate-500"
+                        }`}>
+                            Scans:
+                        </span>
+                        <span className="text-xs font-bold">
+                            {trackingActive ? scanCount : "INAKTIV"}
                     </span>
                 </div>
             </div>
