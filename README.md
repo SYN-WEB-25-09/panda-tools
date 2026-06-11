@@ -1,18 +1,54 @@
-# React + Vite
+# Panda Tools 🐼
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ein praktisches Tool-Set. Diese Anwendung nutzt Firebase für das Backend/Datenmanagement und erfordert für die lokale Kommunikation (z.B. zwischen einer mobilen App/Frontend und einem lokalen Server) die Konfiguration deiner lokalen IPv4-Adresse.
 
-Currently, two official plugins are available:
+## 🚀 Voraussetzungen
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Stelle sicher, dass du folgende Tools auf deinem System installiert hast:
+- [Node.js](https://nodejs.org/) (aktuelle LTS-Version empfohlen)
+- Ein registriertes [Firebase-Projekt](https://console.firebase.google.com/)
 
-## React Compiler
+## 🛠️ Installation & Setup
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+1. **Repository klonen:**
+   ```bash
+   git clone [https://github.com/SYN-WEB-25-09/panda-tools.git](https://github.com/SYN-WEB-25-09/panda-tools.git)
+   cd panda-tools
 
-Note: This will impact Vite dev & build performances.
+2. **Abhängigkeiten installieren:**
+npm install
+# oder falls du yarn nutzt:
+yarn install
 
-## Expanding the ESLint configuration
+3. **Umgebungsvariablen konfigurieren (.env)**
+# LOKALE NETZWERK-KONFIGURATION
+# Ersetze dies mit deiner tatsächlichen lokalen IPv4-Adresse (z.B. 192.168.1.50)
+# Wichtig für die Verbindung im lokalen WLAN-Netzwerk.
+LOCAL_IPV4_ADDRESS=deine.lokale.ipv4.adresse
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# FIREBASE CONFIGURATION
+# Kopiere diese Werte aus deinen Firebase-Projekteinstellungen (Web-App)
+FIREBASE_API_KEY=dein_firebase_api_key
+FIREBASE_AUTH_DOMAIN=dein_projekt_id.firebaseapp.com
+FIREBASE_PROJECT_ID=dein_projekt_id
+FIREBASE_STORAGE_BUCKET=dein_projekt_id.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=deine_messaging_sender_id
+FIREBASE_APP_ID=deine_app_id
+FIREBASE_MEASUREMENT_ID=deine_measurement_id
+
+💡 Tipp zur IPv4-Adresse:
+
+- Windows (Eingabeaufforderung): Öffne die CMD und tippe ipconfig ein. Suche nach IPv4-Adresse.
+
+- Mac / Linux (Terminal): Öffne das Terminal und tippe ifconfig oder ip a ein (oft unter en0 oder wlan0 zu finden).
+
+4. **WICHTIGER HINWEIS ZUM DATENSCHUTZ**
+Die .env-Datei enthält sensible Anmeldedaten und sollte niemals auf GitHub hochgeladen werden. Vergewissere dich, dass deine .gitignore-Datei den Eintrag .env enthält.
+
+## 🏃‍♂️ Anwendung starten
+npm start
+# oder für den Entwicklungsmodus (falls konfiguriert):
+npm run dev
+
+## 📄 Lizenz
+Dieses Projekt ist unter der MIT-Lizenz lizenziert – siehe die LICENSE Datei für Details.
