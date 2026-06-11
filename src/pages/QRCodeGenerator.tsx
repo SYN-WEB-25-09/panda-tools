@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles, Save, Loader2 } from "lucide-react";
 
@@ -46,17 +46,6 @@ export default function QRCodeGenerator() {
             setFinalUrl(baseUrl);
         }
     }, [baseUrl, isTrackingEnabled, qrCodeId]);
-
-    const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target?.result) setImage(event.target.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
 
     const handleRemoveLogo = () => {
         setImage("")
@@ -169,7 +158,7 @@ export default function QRCodeGenerator() {
                                bgColor={bgColor} setBgColor={setBgColor}
                                isTransparent={isTransparent} setIsTransparent={setIsTransparent}
                                exportFormat={exportFormat}
-                               logo={image} handleLogoUpload={handleLogoUpload} handleRemoveLogo={handleRemoveLogo}
+                               logo={image} setLogo={setImage} handleRemoveLogo={handleRemoveLogo}
                                logoSize={imageSize} setLogoSize={setImageSize} fileInputRef={fileInputRef}
                                isUserLoggedIn={!!user} />
 

@@ -18,9 +18,9 @@ type GeneratorFormProps = {
     setIsTransparent: (val: boolean) => void;
     exportFormat: string;
     logo: string;
-    handleLogoUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleRemoveLogo: () => void;
     logoSize: number;
+    setLogo: (url: string) => void;
     setLogoSize: (val: number) => void;
     fileInputRef: React.RefObject<HTMLInputElement | null>;
     isUserLoggedIn: boolean;
@@ -34,8 +34,8 @@ export default function GeneratorForm({
     bgColor, setBgColor,
     isTransparent, setIsTransparent,
     exportFormat,
-    logo, handleLogoUpload, handleRemoveLogo,
-    logoSize, setLogoSize, fileInputRef,
+    logo, setLogo, handleRemoveLogo,
+    logoSize, setLogoSize,
     isUserLoggedIn
 }: GeneratorFormProps) {
     return (
@@ -65,11 +65,10 @@ export default function GeneratorForm({
             
             <LogoSection 
                 logo={logo} 
+                setLogo={setLogo}
                 logoSize={logoSize} 
                 setLogoSize={setLogoSize} 
-                handleLogoUpload={handleLogoUpload} 
                 handleRemoveLogo={handleRemoveLogo} 
-                fileInputRef={fileInputRef} 
             />
         </div>
     );
