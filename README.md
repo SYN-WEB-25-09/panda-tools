@@ -27,11 +27,11 @@ Wichtig für die Verbindung im lokalen WLAN-Netzwerk.\
 VITE_IPV4=deine.lokale.ipv4.adresse
 
 ### FIREBASE CONFIGURATION
-Kopiere diese Werte aus deinen Firebase-Projekteinstellungen (Web-App)
-VITE_FIREBASE_APIKEY=dein_firebase_api_key
-VITE_FIREBASE_AUTHDOMAIN=dein_projekt_id.firebaseapp.com
-VITE_FIREBASE_PROJECTID=dein_projekt_id
-VITE_FIREBASE_STORAGEBUCKET=dein_projekt_id.appspot.com
+Kopiere diese Werte aus deinen Firebase-Projekteinstellungen (Web-App)\
+VITE_FIREBASE_APIKEY=dein_firebase_api_key\
+VITE_FIREBASE_AUTHDOMAIN=dein_projekt_id.firebaseapp.com\
+VITE_FIREBASE_PROJECTID=dein_projekt_id\
+VITE_FIREBASE_STORAGEBUCKET=dein_projekt_id.appspot.com\
 VITE_FIREBASE_APPID=deine_app_id
 
 💡 Tipp zur IPv4-Adresse:
