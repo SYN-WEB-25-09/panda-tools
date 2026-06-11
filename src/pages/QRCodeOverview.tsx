@@ -37,7 +37,7 @@ export default function QRCodeOverview() {
                             countLabelPlural="QR-Codes"
                             buttonText="QR-Code erstellen"
                             buttonIcon={Plus}
-                            onButtonClick={() => navigate("/qrcode-generator")} />
+                            onButtonClick={() => navigate("/qrcode/qrcode-generator")} />
 
             <div className="mb-6 w-full">
                 <div className="relative w-full flex items-center">

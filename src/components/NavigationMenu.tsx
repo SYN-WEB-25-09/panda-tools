@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { useFirebaseAuth } from "../context/FirebaseAuthContext";
-import { LayoutDashboard, QrCode, Link2 } from "lucide-react";
+import { LayoutDashboard, QrCode, Link2, Image as ImageIcon } from "lucide-react";
 
 type NavigationLink = {
     target: string;
@@ -17,8 +17,13 @@ export default function NavigationMenu() {
 
     if (user) {
         menuLinks.push(
+            { target: "/image-library", displayName: "Bilder Library", icon: ImageIcon },
             { target: "/qrcode", displayName: "QR-Code", icon: QrCode },
             { target: "/short-link", displayName: "Short-Link", icon: Link2 },
+        );
+    } else{
+        menuLinks.push(
+            { target: "/qrcode/qrcode-generator", displayName: "QR-Code", icon: QrCode },
         );
     }
 

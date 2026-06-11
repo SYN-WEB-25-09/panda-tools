@@ -1,4 +1,4 @@
-import { QrCode, Link, LucideIcon } from "lucide-react"
+import { QrCode, Link, Image as ImageIcon, LucideIcon } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 import { useFirebaseAuth } from "../context/FirebaseAuthContext";
 import ToolCard from "../components/ToolCard";
@@ -20,12 +20,20 @@ export default function Home() {
         if (user) {
             navigate(targetPath)
         } else {
-            if (targetPath === "/qrcode") navigate("/qrcode-generator")
+            if (targetPath === "/qrcode") navigate("/qrcode/qrcode-generator")
             else navigate("/login")
         }
     }
 
     const tools: ToolItem[] = [
+        {
+            id: 'image-library',
+            title: 'Bilder Library',
+            description: 'Verwalte deine Logos und Bilder. Uploads werden automatisch als kompakte WebP-Grafiken optimiert.',
+            icon: ImageIcon,
+            color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+            action: () => handleToolNagivation('/image-library'),
+        },
         {
             id: 'qr-generator',
             title: 'QR-Code Generator',
