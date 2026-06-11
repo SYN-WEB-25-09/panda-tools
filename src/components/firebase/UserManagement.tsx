@@ -72,7 +72,9 @@ export default function UserManagment() {
         setDeleteError(null);
 
         try {
-
+            await deleteUser(user);
+            alert("Dein Konto wurde erfolgreich gelöscht.");
+            navigate("/login");
         } catch (error: any) {
             console.error("Fehler beim Löschen des Kontos:", error)
 
