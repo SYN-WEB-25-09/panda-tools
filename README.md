@@ -23,18 +23,16 @@ oder falls du yarn nutzt:\
 3. **Umgebungsvariablen konfigurieren (.env)**
 ### LOKALE NETZWERK-KONFIGURATION
 Ersetze dies mit deiner tatsächlichen lokalen IPv4-Adresse (z.B. 192.168.1.50)\
-Wichtig für die Verbindung im lokalen WLAN-Netzwerk.
-LOCAL_IPV4_ADDRESS=deine.lokale.ipv4.adresse
+Wichtig für die Verbindung im lokalen WLAN-Netzwerk.\
+VITE_IPV4=deine.lokale.ipv4.adresse
 
 ### FIREBASE CONFIGURATION
 Kopiere diese Werte aus deinen Firebase-Projekteinstellungen (Web-App)
-FIREBASE_API_KEY=dein_firebase_api_key
-FIREBASE_AUTH_DOMAIN=dein_projekt_id.firebaseapp.com
-FIREBASE_PROJECT_ID=dein_projekt_id
-FIREBASE_STORAGE_BUCKET=dein_projekt_id.appspot.com
-FIREBASE_MESSAGING_SENDER_ID=deine_messaging_sender_id
-FIREBASE_APP_ID=deine_app_id
-FIREBASE_MEASUREMENT_ID=deine_measurement_id
+VITE_FIREBASE_APIKEY=dein_firebase_api_key
+VITE_FIREBASE_AUTHDOMAIN=dein_projekt_id.firebaseapp.com
+VITE_FIREBASE_PROJECTID=dein_projekt_id
+VITE_FIREBASE_STORAGEBUCKET=dein_projekt_id.appspot.com
+VITE_FIREBASE_APPID=deine_app_id
 
 💡 Tipp zur IPv4-Adresse:
 
