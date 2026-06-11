@@ -4,11 +4,11 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBAVQef8058uY2EgVHpPxE4xv5IcSs8qhU",
-  authDomain: "panda-tools-dcbe2.firebaseapp.com",
-  projectId: "panda-tools-dcbe2",
-  storageBucket: "panda-tools-dcbe2.firebasestorage.app",
-  appId: "1:256252465852:web:67b79503de881c0a46b6b9",
+  apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECTID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGEBUCKET,
+  appId: import.meta.env.VITE_FIREBASE_APPID,
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
