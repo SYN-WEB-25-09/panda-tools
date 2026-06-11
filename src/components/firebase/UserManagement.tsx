@@ -1,8 +1,10 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useFirebaseAuth } from "../../context/FirebaseAuthContext";
-import { Save, ArrowLeft, Loader2, AlertCircle, CheckCircle2, User, Mail, Lock } from "lucide-react"
+import { deleteUser } from "firebase/auth";
+import { Save, ArrowLeft, Loader2, AlertCircle, CheckCircle2, User, Mail, Lock, Trash2 } from "lucide-react"
 import { FormInput } from "../ui/FormInput";
 import { profileSchema, ProfileFormData } from "../../schemas/profileSchema";
 import { useFirebaseActionProfile } from "../../hooks/useFirebase";
@@ -12,6 +14,9 @@ export default function UserManagment() {
     const navigate = useNavigate();
 
     const { isLoading, profileError, successMessage, handleProfileUpdate } = useFirebaseActionProfile();
+
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
         resolver: yupResolver(profileSchema),
@@ -47,6 +52,41 @@ export default function UserManagment() {
             })
         });
     };
+
+    const handleDeleteAccount = async () => {
+        const confirmFirst = window.confirm(
+            "WARNUNG: Mochtest du dein Konto wirklich unwiderruflich löschen? Alle deine Daten und Einstellungen gehen verloren."
+        );
+
+        if (!confirmFirst) return;
+
+        const confirmSecond = window.prompt(
+            "Um das Löschen zu bestätigen, gib bitte das Wort 'LÖSCHEN' ein:"
+        );
+
+        if (confirmSecond !== "LÖSCHEN") {
+            alert("Die Bestätigung war nicht korrekt. Vorgang abgebrochen.")
+        }
+
+        setIsDeleting(true);
+        setDeleteError(null);
+
+        try {
+
+        } catch (error: any) {
+            console.error("Fehler beim Löschen des Kontos:", error)
+
+            if (error.code === "auth/requires-recent-login"){
+                setDeleteError(
+                    "Aus Sicherheitsgründen musst du dich frisch eingeloggt haben, um dein Konto zu löschen. Bitte melde dich ab, erneut an und versuche es noch einmal."
+                );
+            } else {
+                setDeleteError("Fehler beim Löschen des Kontos. Bitte versuche es später erneut.")
+            }
+        } finally {
+            setIsDeleting(false);
+        }
+    }
 
     return (
         <div className="w-full max-w-xl mx-auto py-6 px-4">
@@ -123,8 +163,29 @@ export default function UserManagment() {
                         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:bg-purple-400 text-white font-semibold text-sm transition-all cursor-pointer shadow-xs">
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Änderung Speichern</>}
                 </button>
-
             </form>
+
+            <div className="bg-rose-500/5 dark:bg-rose-950/10 p-6 rounded-2xl border border-rose-200/60 dark:border-rose-900/30 shadow-xs flex flex-col gap-4">
+                <div>
+                    <h3 className="text-sm font-bold text-rose-700 dark:text-rose-400 flex items-center gap-2">
+                        <Trash2 className="w-4 h-4" />Gefahrenzone
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        Sobald du dein Konto löscht, gibt es kein Zurück mehr. Bitte sei dir absolut sicher.
+                    </p>
+                </div>
+
+                <button type="button"
+                        disabled={isLoading || isDeleting}
+                        onClick={handleDeleteAccount}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:bg-rose-400 text-white font-semibold text-sm transition-all cursor-pointer shadow-xs">
+                    {isDeleting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                        "Konto unwiderruflich löschen"
+                    )}
+                </button>
+            </div>
 
         </div>
     )
