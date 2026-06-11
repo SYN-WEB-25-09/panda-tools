@@ -125,6 +125,13 @@ export default function UserManagment() {
                 </div>
             )}
 
+            {deleteError && (
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 text-xs font-medium border border-amber-100 dark:border-amber-900/30">
+                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>{deleteError}</span>
+                </div>
+            )}
+
             <form onSubmit={handleSubmit(onSubmit)}
                   className="space-y-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
 
