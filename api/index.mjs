@@ -26,35 +26,39 @@ const passwordResetLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 const isProduction = process.env.NODE_ENV === "production";
-const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
+const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV
 
 try {
-    if (getApps().length === 0) {
-        let serviceAccount;
+    let serviceAccount;
 
-        if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-            // Live auf Vercel: JSON aus der Umgebungsvariable parsen
-            serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+    } else {
+        const jsonPath = path.join(__dirname, "../serviceAccountKey.json");
+        if (fs.existsSync(jsonPath)) {
+            serviceAccount = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
         } else {
-            // Lokal auf dem PC: Aus der Datei lesen
-            const jsonPath = path.join(__dirname, "../serviceAccountKey.json");
-            if (fs.existsSync(jsonPath)) {
-                serviceAccount = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
-            } else {
-                console.warn("⚠️ Keine serviceAccountKey.json gefunden. Falls du lokal testest, prüfe deine .env.");
-            }
+            console.warn("⚠️ Keine serviceAccountKey.json gefunden. Falls du lokal testest, prüfe deine .env.");
         }
-        
-        if (serviceAccount) {
+    }
+    
+    if (serviceAccount) {
+        try {
             initializeApp({
                 credential: cert(serviceAccount)
             });
             console.log("🚀 Firebase Admin erfolgreich initialisiert.");
+        } catch (initError) {
+            // Falls Express v5 / Node im Dev-Modus die Datei heiß neu lädt:
+            if (initError.code === "app/duplicate-app" || initError.message.includes("already exists")) {
+                console.log("🔄 Firebase Admin bereits aktiv (Hot-Reload).");
+            } else {
+                throw initError;
+            }
         }
     }
 } catch (error) {
