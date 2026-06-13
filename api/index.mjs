@@ -26,14 +26,34 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+const allowedOrigins = [
+    "https://panda-tools.de",
+    "https://www.panda-tools.de",
+    "http://localhost:5173",
+    "http://localhost:3000"
+];
+
+app.options("*", cors());
+
 app.use(express.json());
 
 const isProduction = process.env.NODE_ENV === "production";
 const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
 
 app.use(cors({
-    origin: frontend_url,
-    credentials: true
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error("Nicht erlaubt durch CORS-Richtlinie"));
+        }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 
 try {
