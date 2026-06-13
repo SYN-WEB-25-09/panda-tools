@@ -1,12 +1,6 @@
 {
   "version": 2,
   "framework": "vite",
-  "functions": {
-    "api/index.mjs": {
-      "includeFiles": "api/assets/**",
-      "bundle": false
-    }
-  },
   "rewrites": [
     { 
       "source": "/api/(.*)", 
