@@ -3,7 +3,6 @@
   "framework": "vite",
   "functions": {
     "api/index.mjs": {
-      "nodeVersion": "22.x",
       "includeFiles": "api/assets/**",
       "bundle": false
     }
