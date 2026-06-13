@@ -34,7 +34,8 @@ export default function FirebaseAuthPanel() {
 
         setResetLoading(true);
 
-        const backend_url = import.meta.env.DEV ? "http://localhost:3000" : "https://api.panda-tools.de";
+        /*const backend_url = import.meta.env.DEV ? "http://localhost:3000" : "https://api.panda-tools.de";*/
+        const backend_url = import.meta.env.DEV ? "http://localhost:3000" : "https://panda-tools.de";
 
         try {
             const response = await fetch(`${backend_url}/api/auth/forgot-password`, {
