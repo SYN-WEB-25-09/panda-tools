@@ -33,9 +33,8 @@ const allowedOrigins = [
     "http://localhost:3000"
 ];
 
-app.use(cors({
+const corsOptions = {
     origin: function (origin, callback) {
-        // Erlaubt Anfragen ohne Origin (z.B. Postman oder Server-zu-Server)
         if (!origin) return callback(null, true);
         
         if (allowedOrigins.indexOf(origin) !== -1) {
@@ -47,11 +46,11 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    optionsSuccessStatus: 200 // Wichtig für ältere Browser und Vercel Preflights
-}));
+    optionsSuccessStatus: 200
+};
 
 app.use(cors(corsOptions));
-app.options("*", cors());
+app.options("*", cors(corsOptions));
 app.use(express.json());
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -61,10 +60,8 @@ try {
     let serviceAccount;
 
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-        // Live auf Vercel: JSON aus der Umgebungsvariable parsen
         serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     } else {
-        // Lokal auf dem PC: Aus der Datei lesen
         const jsonPath = path.join(__dirname, "../serviceAccountKey.json");
         serviceAccount = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
     }
@@ -76,7 +73,6 @@ try {
     console.log("🚀 Firebase Admin erfolgreich initialisiert.");
 } catch (error) {
     console.error("❌ Fehler beim Initialisieren von Firebase:", error.message);
-    // Bei Vercel Serverless Functions werfen wir den Fehler, statt den Prozess zu killen
     throw error; 
 }
 
