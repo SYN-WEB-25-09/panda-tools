@@ -1,24 +1,22 @@
-import express from "express";
-import { initializeApp, cert } from "firebase-admin/app"; 
-import { getAuth } from "firebase-admin/auth";
-import nodemailer from "nodemailer";
-import cors from "cors";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import dotenv from "dotenv";
-import rateLimit from "express-rate-limit";
+const express = require("express");
+const { initializeApp, cert } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
+const nodemailer = require("nodemailer");
+const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
+const dotenv = require("dotenv");
+const rateLimit = require("express-rate-limit");
 
+// Umgebungsvariablen laden
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Spam-Schutz (Rate Limiting)
 const passwordResetLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
-    max: 3,
+    windowMs: 60 * 60 * 1000, 
+    max: 3, 
     message: { 
         error: "Zu viele Anfragen. Bitte warte eine Stunde, bevor du es erneut versuchst." 
     },
@@ -28,6 +26,7 @@ const passwordResetLimiter = rateLimit({
 
 app.use(cors());
 
+// Preflight-Anfragen sofort abfangen
 app.options("/api/auth/forgot-password", (req, res) => {
     return res.status(200).end();
 });
@@ -35,8 +34,9 @@ app.options("/api/auth/forgot-password", (req, res) => {
 app.use(express.json());
 
 const isProduction = process.env.NODE_ENV === "production";
-const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV
+const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
 
+// Firebase Admin SDK initialisieren
 try {
     let serviceAccount;
 
@@ -58,7 +58,6 @@ try {
             });
             console.log("🚀 Firebase Admin erfolgreich initialisiert.");
         } catch (initError) {
-            // Falls Express v5 / Node im Dev-Modus die Datei heiß neu lädt:
             if (initError.code === "app/duplicate-app" || initError.message.includes("already exists")) {
                 console.log("🔄 Firebase Admin bereits aktiv (Hot-Reload).");
             } else {
@@ -70,6 +69,7 @@ try {
     console.error("❌ Fehler beim Initialisieren von Firebase:", error.message);
 }
 
+// Nodemailer Transporter einrichten
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || "465"),
@@ -80,6 +80,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// API-Endpunkt für "Passwort vergessen"
 app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => {
     const { email } = req.body;
 
@@ -170,11 +171,12 @@ app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => 
     }
 });
 
-if (!isProduction) {
+// Nur lokal ausführen
+if (process.env.NODE_ENV !== "production") {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
         console.log(`🤖 Lokales Panda Tools Backend läuft auf Port ${PORT}`);
     });
 }
 
-export default app;
+module.exports = app;
