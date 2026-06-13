@@ -200,9 +200,11 @@ app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => 
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Panda Tools Backend läuft auf Port ${PORT}`);
-});
+if (!isProduction) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🤖 Lokales Panda Tools Backend läuft auf Port ${PORT}`);
+    });
+}
 
 export default app;
