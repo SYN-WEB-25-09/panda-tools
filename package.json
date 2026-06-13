@@ -1,7 +1,7 @@
 {
   "name": "panda-tools",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "engines": {
     "node": "22.x"
@@ -11,9 +11,8 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "node api/index.mjs",
-    "fullstack": "concurrently \"npm run server\" \"npm run dev\"",
-    "fullstack:build": "npm run build"
+    "server": "node api/index.mjs", 
+    "fullstack": "concurrently \"npm run server\" \"npm run dev\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -23,9 +22,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "firebase": "^12.13.0",
-    "firebase-admin": "^14.0.0",
     "lucide-react": "^1.16.0",
-    "nodemailer": "^8.0.11",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
