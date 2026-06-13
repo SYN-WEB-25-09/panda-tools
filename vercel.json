@@ -1,9 +1,19 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/index.mjs",
+      "use": "@vercel/node"
+    }
+  ],
   "rewrites": [
     { 
       "source": "/api/(.*)", 
       "destination": "/api/index.mjs" 
+    },
+    {
+      "source": "/((?!api|assets|.*\\.).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
