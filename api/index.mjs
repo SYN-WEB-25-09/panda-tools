@@ -11,6 +11,11 @@ import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+
 const passwordResetLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 3,
@@ -21,34 +26,6 @@ const passwordResetLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const app = express();
-
-const allowedOrigins = [
-    "https://panda-tools.de",
-    "https://www.panda-tools.de",
-    "http://localhost:5173",
-    "http://localhost:3000"
-];
-
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error("Nicht erlaubt durch CORS-Richtlinie"));
-        }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 app.use(express.json());
@@ -57,38 +34,32 @@ const isProduction = process.env.NODE_ENV === "production";
 const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
 
 try {
-    let serviceAccount;
+    if (getApps().length === 0) {
+        let serviceAccount;
 
-    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    } else {
-        const jsonPath = path.join(__dirname, "../serviceAccountKey.json");
-        serviceAccount = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+        if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+            // Live auf Vercel: JSON aus der Umgebungsvariable parsen
+            serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        } else {
+            // Lokal auf dem PC: Aus der Datei lesen
+            const jsonPath = path.join(__dirname, "../serviceAccountKey.json");
+            if (fs.existsSync(jsonPath)) {
+                serviceAccount = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+            } else {
+                console.warn("⚠️ Keine serviceAccountKey.json gefunden. Falls du lokal testest, prüfe deine .env.");
+            }
+        }
+        
+        if (serviceAccount) {
+            initializeApp({
+                credential: cert(serviceAccount)
+            });
+            console.log("🚀 Firebase Admin erfolgreich initialisiert.");
+        }
     }
-    
-    initializeApp({
-        credential: cert(serviceAccount)
-    });
-    
-    console.log("🚀 Firebase Admin erfolgreich initialisiert.");
 } catch (error) {
     console.error("❌ Fehler beim Initialisieren von Firebase:", error.message);
-    throw error; 
 }
-
-/*try {
-    const jsonPath = path.join(__dirname, "../serviceAccountKey.json");
-    const serviceAccount = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
-    
-    initializeApp({
-        credential: cert(serviceAccount)
-    });
-    
-    console.log("🚀 Firebase Admin erfolgreich initialisiert.");
-} catch (error) {
-    console.error("❌ Fehler beim Initialisieren von Firebase:", error.message);
-    process.exit(1);
-}*/
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -97,14 +68,6 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-    }
-});
-
-transporter.verify((error) => {
-    if (error) {
-        console.error("❌ SMTP Verbindung fehlgeschlagen:", error.message);
-    } else {
-        console.log("📧 SMTP Server ist bereit für den E-Mail-Versand.");
     }
 });
 
@@ -117,9 +80,9 @@ app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => 
 
     try {
         const actionCodeSettings = {
-            url:`${frontend_url}/reset-password`,
+            url: `${frontend_url}/reset-password`,
             handleCodeInApp: true,
-        }
+        };
 
         const auth = getAuth();
         const rawFirebaseLink = await auth.generatePasswordResetLink(email, actionCodeSettings);
@@ -158,9 +121,7 @@ app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => 
                     </div>
                     <div class="content">
                         <p>Hallo,<br><br>wir haben eine Anfrage zum Zurücksetzen deines Passworts für dein Panda Tools Konto erhalten. Klicke auf den folgenden Button, um ein neues Passwort festzulegen:</p>
-                        
                         <a href="${customResetLink}" class="btn" target="_blank">Passwort zurücksetzen</a>
-                        
                         <div class="link-alt">
                             <strong>Link funktioniert nicht?</strong> Kopiere die folgende URL in deinen Browser:<br>
                             <span style="color: #9333ea;">${customResetLink}</span>
@@ -187,16 +148,16 @@ app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => 
             }]
         });
 
-        return res.status(200).json({ success: true, message: "E-Mail erfolgreich gesendet."})
+        return res.status(200).json({ success: true, message: "E-Mail erfolgreich gesendet."});
         
     } catch (error) {
-        console.error("Fehler beim Generieren/Senden des Passwort-Rests:", error);
+        console.error("Fehler beim Generieren/Senden des Passwort-Resets:", error);
 
         if (error.code === "auth/user-not-found") {
             return res.status(444).json({ error: "Diese E-Mail-Adresse ist uns nicht bekannt."});
         }
 
-        return res.status(500).json({ error: "Das Passwort konnte nicht zurückgesetzt werden. Versuche es später erneut."})
+        return res.status(500).json({ error: "Das Passwort konnte nicht zurückgesetzt werden. Versuche es später erneut."});
     }
 });
 
