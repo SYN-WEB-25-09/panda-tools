@@ -42,6 +42,7 @@ const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.
 
 app.use(cors({
     origin: function (origin, callback) {
+        // Erlaubt Anfragen ohne Origin (z.B. Postman oder Server-zu-Server)
         if (!origin) return callback(null, true);
         
         if (allowedOrigins.indexOf(origin) !== -1) {
@@ -53,7 +54,7 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200 // Wichtig für ältere Browser und Vercel Preflights
 }));
 
 try {
