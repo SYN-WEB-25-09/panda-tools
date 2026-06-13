@@ -8,6 +8,7 @@ import Redirect from "./components/Redirect";
 import NotFound from "./pages/NotFound";
 import FirebaseAuth from "./pages/FirebaseAuth"
 import UserManagement from "./components/firebase/UserManagement"
+import ResetPassword from "./pages/ResetPassword";
 
 export default function Router() {
     return (
@@ -20,6 +21,7 @@ export default function Router() {
             <Route path="/qrcodes/:id" element={<QRCodeDetail />} />
             <Route path="/qrcodes/new" element={<QRCodeGenerator />} />
             <Route path="/r/:id" element={<Redirect />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/*" element={<NotFound />} />
         </Routes>
     )

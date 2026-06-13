@@ -28,13 +28,39 @@ export default function FirebaseAuthPanel() {
         if (!currentEmail) {
             setError("email", {
                 type: "manual",
-                message: "Bitte gib zuerst deine E-Mail-Adresse in."
+                message: "Bitte gib zuerst deine E-Mail-Adresse ein."
             })
             return;
         }
 
         setResetLoading(true);
-        const auth = getAuth();
+
+        const backend_url = import.meta.env.DEV ? "http://localhost:3000" : "https://api.panda-tools.de";
+
+        try {
+            const response = await fetch(`${backend_url}/api/auth/forgot-password`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email: currentEmail }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Fehler beim Senden.")
+            }
+
+            setResetSuccess("Eine maßgeschneiderte E-Mail mit Anweisungen zum Zurücksetzen wurde an dich gesendet!");
+        } catch (error: any) {
+            console.error("API Fehler:", error)
+            setResetError(error.message || "Es gab ein Problem beim Kommunizieren mit dem Server.");
+        } finally {
+            setResetLoading(false);
+        }
+
+        /*const auth = getAuth();
 
         try {
             await sendPasswordResetEmail(auth, currentEmail);
@@ -50,7 +76,7 @@ export default function FirebaseAuthPanel() {
             }
         } finally {
             setResetLoading(false);
-        }
+        }*/
     }
 
     return (
