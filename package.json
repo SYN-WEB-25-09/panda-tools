@@ -5,15 +5,16 @@
   "type": "module",
   "engines": {
     "node": "22.x"
-  },
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "server": "node api/index.mjs", 
-    "fullstack": "concurrently \"npm run server\" \"npm run dev\""
-  },
+  },"scripts": {
+  "dev": "vite",
+  "build": "tsc && vite build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "api:install": "npm install --prefix api",
+  "server": "node api/index.mjs",
+  "fullstack": "concurrently \"npm run server\" \"npm run dev\"",
+  "fullstack:build": "npm run build"
+},
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
     "@tailwindcss/vite": "^4.3.0",

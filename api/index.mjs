@@ -1,18 +1,3 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-
-try {
-    const jose = await import("jose");
-    module.prototype.require = new Proxy(module.prototype.require, {
-        apply(target, thisArg, argumentsList) {
-            if (argumentsList[0] === "jose") return jose;
-            return Reflect.apply(target, thisArg, argumentsList);
-        }
-    });
-} catch (e) {
-    // Falls lokal nicht benötigt, einfach ignorieren
-}
-
 import express from "express";
 import { initializeApp, cert } from "firebase-admin/app"; 
 import { getAuth } from "firebase-admin/auth";
