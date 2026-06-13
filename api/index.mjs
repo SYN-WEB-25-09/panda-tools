@@ -1,18 +1,3 @@
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-
-try {
-    const joseModule = await import("jose");
-    const Module = require("module");
-    const originalRequire = Module.prototype.require;
-    Module.prototype.require = function (manifestPath) {
-        if (manifestPath === "jose") return joseModule;
-        return originalRequire.apply(this, arguments);
-    };
-} catch (error) {
-    console.warn("CORS/ESM Patch Warning:", error.message);
-}
-
 import express from "express";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
