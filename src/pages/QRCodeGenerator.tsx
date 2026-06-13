@@ -132,7 +132,7 @@ export default function QRCodeGenerator() {
                 </div>
 
                 <div className="flex items-center justify-between sm:contents">
-                    <button onClick={() => navigate("/qrcode")} 
+                    <button onClick={() => navigate("/qrcodes")} 
                             className="flex items-center justify-center p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer shrink-0 sm:order-1">
                         <ArrowLeft className="w-5 h-5" />
                     </button>

@@ -20,7 +20,7 @@ export default function QRCodeCard({ id, title, url, scanCount, trackingActive, 
     const navigate = useNavigate();
 
     return (
-        <div onClick={() => navigate(`/qrcode/${id}`)}
+        <div onClick={() => navigate(`/qrcodes/${id}`)}
              className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 transition-all hover:border-purple-500/50 dark:hover:border-purple-500/50 hover:shadow-md cursor-pointer group">
         <QRCodeHeader title={title}
                       createdAt={createdAt}

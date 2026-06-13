@@ -18,12 +18,12 @@ export default function NavigationMenu() {
     if (user) {
         menuLinks.push(
             { target: "/image-library", displayName: "Bilder Library", icon: ImageIcon },
-            { target: "/qrcode", displayName: "QR-Code", icon: QrCode },
+            { target: "/qrcodes", displayName: "QR-Code", icon: QrCode },
             { target: "/short-link", displayName: "Short-Link", icon: Link2 },
         );
     } else{
         menuLinks.push(
-            { target: "/qrcode/qrcode-generator", displayName: "QR-Code", icon: QrCode },
+            { target: "/qrcodes/new", displayName: "QR-Code", icon: QrCode },
         );
     }
 

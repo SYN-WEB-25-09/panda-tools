@@ -16,9 +16,9 @@ export default function Router() {
             <Route path="/login" element={<FirebaseAuth />} />
             <Route path="/profile" element={<UserManagement />} />
             <Route path="/image-library" element={<ImageLibrary />} />
-            <Route path="/qrcode" element={<QRCodeOverview />} />
-            <Route path="/qrcode/:id" element={<QRCodeDetail />} />
-            <Route path="/qrcode/qrcode-generator" element={<QRCodeGenerator />} />
+            <Route path="/qrcodes" element={<QRCodeOverview />} />
+            <Route path="/qrcodes/:id" element={<QRCodeDetail />} />
+            <Route path="/qrcodes/new" element={<QRCodeGenerator />} />
             <Route path="/r/:id" element={<Redirect />} />
             <Route path="/*" element={<NotFound />} />
         </Routes>

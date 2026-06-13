@@ -20,7 +20,7 @@ export default function Home() {
         if (user) {
             navigate(targetPath)
         } else {
-            if (targetPath === "/qrcode") navigate("/qrcode/qrcode-generator")
+            if (targetPath === "/qrcodes") navigate("/qrcodes/new")
             else navigate("/login")
         }
     }
@@ -40,7 +40,7 @@ export default function Home() {
             description: 'Erstelle im Handumdrehen anpassbare QR-Codes für Links, Texte oder WLAN-Zugänge.',
             icon: QrCode,
             color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-            action: () => handleToolNagivation('/qrcode'),
+            action: () => handleToolNagivation('/qrcodes'),
         },
         {
             id: 'short-link',
