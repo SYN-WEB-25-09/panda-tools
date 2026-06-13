@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { LogIn, UserPlus, Loader2, AlertCircle, CheckCircle2, User, Mail, Lock } from "lucide-react";
 import { FormInput } from "../ui/FormInput";
 import { authSchema, AuthFormData } from "../../schemas/authSchema";
