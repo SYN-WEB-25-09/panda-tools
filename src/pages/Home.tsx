@@ -48,7 +48,7 @@ export default function Home() {
             description: 'Kürze lange URLs in saubere, trackbare und leicht teilbare Kurzlinks.',
             icon: Link,
             color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-            action: () => handleToolNagivation('/short-link'),
+            action: () => handleToolNagivation('/short-links'),
         },
     ];
 

@@ -4,6 +4,7 @@ import ImageLibrary from "./pages/ImageLibrary";
 import QRCodeOverview from "./pages/QRCodeOverview"
 import QRCodeDetail from "./pages/QRCodeDetail"
 import QRCodeGenerator from "./pages/QRCodeGenerator";
+import ShortLinkOverview from "./pages/ShortLinkOverview";
 import Redirect from "./components/Redirect";
 import NotFound from "./pages/NotFound";
 import FirebaseAuth from "./pages/FirebaseAuth"
@@ -20,6 +21,7 @@ export default function Router() {
             <Route path="/qrcodes" element={<QRCodeOverview />} />
             <Route path="/qrcodes/:id" element={<QRCodeDetail />} />
             <Route path="/qrcodes/new" element={<QRCodeGenerator />} />
+            <Route path="/short-links" element={<ShortLinkOverview />} />
             <Route path="/r/:id" element={<Redirect />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/*" element={<NotFound />} />

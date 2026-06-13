@@ -19,7 +19,7 @@ export default function NavigationMenu() {
         menuLinks.push(
             { target: "/image-library", displayName: "Bilder Library", icon: ImageIcon },
             { target: "/qrcodes", displayName: "QR-Code", icon: QrCode },
-            { target: "/short-link", displayName: "Short-Link", icon: Link2 },
+            { target: "/short-links", displayName: "Short-Link", icon: Link2 },
         );
     } else{
         menuLinks.push(
