@@ -1,12 +1,9 @@
 {
+  "version": 2,
   "rewrites": [
     { 
       "source": "/api/(.*)", 
       "destination": "/api/index.mjs" 
-    },
-    { 
-      "source": "/((?!api|assets|.*\\.).*)", 
-      "destination": "/index.html" 
     }
   ],
   "headers": [

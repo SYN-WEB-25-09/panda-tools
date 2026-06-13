@@ -27,6 +27,11 @@ const passwordResetLimiter = rateLimit({
 });
 
 app.use(cors());
+
+app.options("/api/auth/forgot-password", (req, res) => {
+    return res.status(200).end();
+});
+
 app.use(express.json());
 
 const isProduction = process.env.NODE_ENV === "production";
