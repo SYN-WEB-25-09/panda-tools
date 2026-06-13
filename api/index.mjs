@@ -33,13 +33,6 @@ const allowedOrigins = [
     "http://localhost:3000"
 ];
 
-app.options("*", cors());
-
-app.use(express.json());
-
-const isProduction = process.env.NODE_ENV === "production";
-const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
-
 app.use(cors({
     origin: function (origin, callback) {
         // Erlaubt Anfragen ohne Origin (z.B. Postman oder Server-zu-Server)
@@ -56,6 +49,13 @@ app.use(cors({
     credentials: true,
     optionsSuccessStatus: 200 // Wichtig für ältere Browser und Vercel Preflights
 }));
+
+app.use(cors(corsOptions));
+app.options("*", cors());
+app.use(express.json());
+
+const isProduction = process.env.NODE_ENV === "production";
+const frontend_url = isProduction ? process.env.FRONTEND_URL_PROD : process.env.FRONTEND_URL_DEV;
 
 try {
     let serviceAccount;
