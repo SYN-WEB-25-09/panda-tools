@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles, Save, Loader2, Copy, Check, ExternalLink, Inbox } from "lucide-react";
 
-import { useFirebaseActionAuth } from "../hooks/useFirebase";
 import { useUniqueId } from "../hooks/useUniqueId";
 import { useSaveShortLink } from "../hooks/useShortLink";
 import { useFirebaseAuth } from "../context/FirebaseAuthContext";
