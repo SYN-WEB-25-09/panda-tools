@@ -175,7 +175,7 @@ export default function ShortLinkGenerator() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col grow justify-between bg-slate-50 dark:bg-slate-950/40 rounded-xl p-4 border border-slate-100 dark:border-slate-950 min-h-[160px]">
+                        <div className="flex flex-col grow justify-between bg-slate-50 dark:bg-slate-950/40 rounded-xl p-4 border border-slate-100 dark:border-slate-950 min-h-40">
                             
                             <div className="flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xs">
                                 <span className="text-xs font-semibold text-purple-400 dark:text-purple-500/80 truncate pr-2">
