@@ -17,7 +17,7 @@ export default function ShortLinkCard({ id, title, url, clickCount, trackingActi
 
     return (
         <div onClick={() => navigate(`/short-links/${id}`)}
-             className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 transition-all hover:border-purple-500/50 dark:hover:border-purple-500/50 hover:shadow-md cursor-pointer group justify-between min-h-65 w-full min-w-75 max-w-90 mx-auto">
+             className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 transition-all hover:border-purple-500/50 dark:hover:border-purple-500/50 hover:shadow-md cursor-pointer group justify-between min-h-65 w-full min-w-0 max-w-90 mx-auto">
             <ShortLinkHeader title={title} url={url} createdAt={createdAt} onDelete={onDelete} />
             <ShortLinkBody 
                 id={id} 
