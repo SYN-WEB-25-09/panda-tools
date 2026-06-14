@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Save, Loader2, Copy, Check, ExternalLink } from "lucide-react";
+import { ArrowLeft, Sparkles, Save, Loader2, Check, ExternalLink, Eye } from "lucide-react";
 
 import { useUniqueId } from "../hooks/useUniqueId";
 import { useSaveShortLink } from "../hooks/useShortLink";
@@ -15,7 +15,6 @@ export default function ShortLinkGenerator() {
     const { triggerSave, isSaving } = useSaveShortLink();
 
     const[isSaved, setIsSaved] = useState(false);
-    const [copied, setCopied] = useState(false);
 
     const [title, setTitle] = useState("");
     const [baseUrl, setBaseUrl] = useState("");
@@ -55,18 +54,12 @@ export default function ShortLinkGenerator() {
             title,
             baseUrl,
             isTrackingEnabled,
-            onSuccess: () => {setIsSaved(true);}
+            onSuccess: () => {
+                setIsSaved(true);
+                navigate(`/short-links/${shortLinkId}`);
+            }
         });
     };
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(finalUrl);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (error) {
-            console.error("Fehler beim Kopieren", error)
-        }
-    }
 
     return (
         <div className="w-full max-w-5xl mx-auto py-6 px-4">
@@ -102,9 +95,9 @@ export default function ShortLinkGenerator() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
-                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-6">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/80 shadow-xs space-y-6">
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
                             Titel des Links
@@ -157,7 +150,7 @@ export default function ShortLinkGenerator() {
                     )}
                 </div>
 
-                <div className="lg:col-span-5 bg-slate-50/50 dark:bg-slate-900/30 p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 space-y-6">
+                <div className="bg-slate-50/50 dark:bg-slate-900/30 p-6 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 space-y-4">
                     <div>
                         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
                             Live-Vorschau
@@ -167,57 +160,52 @@ export default function ShortLinkGenerator() {
                         </p>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-xs space-y-4">
-                        <div className="space-y-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                Dein Kurzlink
-                            </span>
+                    <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 justify-between min-h-65 w-full max-w-90 mx-auto select-none pointer-events-none opacity-90">
+                        <div className="flex items-start justify-between gap-2 mb-4">
+                            <div className="truncate flex-1">
+                                <h3 className="font-bold text-slate-900 dark:text-slate-50 truncate">
+                                    {title.trim() || "Unbenannter Kurzlink"}
+                                </h3>
+                                <p className="text-xs text-slate-600 dark:text-slate-200 font-mono truncate mt-0.5">
+                                    {baseUrl.trim() || "https://deine-ziel-url.de"}
+                                </p>
+                                <span className="text-[10px] text-slate-400 dark:text-slate-500 block mt-1">
+                                    Erstellt am Heute
+                                </span>
+                            </div>
+                        </div>
 
-                            <div onClick={handleCopy}
-                                 className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:border-purple-500/50 transition-colors group/preview">
-                                <span className="text-sm font-bold text-purple-600 dark:text-purple-400 truncate pr-2">
+                        <div className="flex flex-col grow justify-between bg-slate-50 dark:bg-slate-950/40 rounded-xl p-4 border border-slate-100 dark:border-slate-950 min-h-[160px]">
+                            
+                            <div className="flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-2xs">
+                                <span className="text-xs font-semibold text-purple-400 dark:text-purple-500/80 truncate pr-2">
                                     {isIdGenerating ? "Generiere ID..." : finalUrl.replace(/^https?:\/\//, "")}
                                 </span>
-                                <div className="text-slate-400 group-hover/preview:text-purple-500 transition-colors shrink-0">
-                                    {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                                </div>
+                                <Sparkles className="w-3.5 h-3.5 text-purple-400/50 shrink-0" />
+                            </div>
+
+                            <div className="flex flex-col items-center justify-center my-auto py-3">
+                                {isTrackingEnabled ? (
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
+                                            0
+                                        </span>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-0.5">
+                                            <Eye className="w-3 h-3" /> Klicks
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-slate-200/60 dark:bg-slate-900 text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                        Tracking Inaktiv
+                                    </span>
+                                )}
+                            </div>
+
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-300 dark:text-slate-600">
+                                Link testen <ExternalLink className="w-3 h-3" />
                             </div>
                         </div>
-
-                        <div className="space-y-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                                Typ & Routing
-                            </span>
-                            <div className="flex items-center justify-between text-xs font-semibold">
-                                <span className="text-slate-600 dark:text-slate-400">
-                                    Status:
-                                </span>
-                                <span className={isTrackingEnabled ? "text-purple-600 dark:text-purple-400" : "text-slate-500"}>
-                                    {isTrackingEnabled ? "Dynamisch mit Analytics" : "Direkter Redirect"}
-                                </span>
-                            </div>
-                        </div>
-
-                        {baseUrl && baseUrl !== "https://example.com" && (
-                            <div className="border-t border-slate-100 dark:border-slate-800/80 pt-3 flex items-center justify-between text-xs">
-                                <span className="text-slate-400 dark:text-slate-500 truncate max-w-45" title={baseUrl}>
-                                    Ziel: {baseUrl}
-                                </span>
-                                <a href={baseUrl}
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   className="flex items-center gap-1 text-purple-600 dark:text-purple-400 hover:underline">
-                                    Testen <ExternalLink className="w-3 h-3" />
-                                </a>
-                            </div>
-                        )}
                     </div>
-
-                    {isTrackingEnabled && !isSaved && (
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center leading-normal px-2">
-                            ⚠️ Vergiss nicht, den Link oben rechts zu <strong>speichern</strong>, damit das Routing in der Datenbank aktiv geschaltet wird!
-                        </p>
-                    )}
                 </div>
 
             </div>

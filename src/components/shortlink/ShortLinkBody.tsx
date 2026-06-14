@@ -1,14 +1,13 @@
 import { useState } from "react";
-import { Check, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink, Eye } from "lucide-react";
 
 type ShortLinkBodyProps = {
     id: string;
-    url: string;
     clickCount: number;
     trackingActive: boolean;
 }
 
-export default function ShortLinkBody({ id, url, clickCount, trackingActive }: ShortLinkBodyProps) {
+export default function ShortLinkBody({ id, clickCount, trackingActive }: ShortLinkBodyProps) {
     const [copied, setCopied] = useState(false);
     const { protocol, hostname, port } = window.location;
 
@@ -45,23 +44,33 @@ export default function ShortLinkBody({ id, url, clickCount, trackingActive }: S
                     </div>
                 </div>
 
-                <a 
-                    href={shortURL} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors mt-1"
+                <div className="flex flex-col items-center justify-center my-auto py-3">
+                {trackingActive ? (
+                    <div className="flex flex-col items-center">
+                        <span className="text-3xl font-black text-purple-600 dark:text-purple-400 tracking-tight">
+                            {clickCount}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-0.5">
+                            <Eye className="w-3 h-3" /> Klicks
+                        </span>
+                    </div>
+                ) : (
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-slate-200/60 dark:bg-slate-900 text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                        Tracking Inaktiv
+                    </span>
+                )}
+            </div>
+
+                <a href={shortURL} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors mt-1"
                 >
                     Link testen <ExternalLink className="w-3 h-3" />
                 </a>
             </div>
 
-            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800/60 pt-3 mt-auto">
-                <span 
-                    className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-37.5"
-                    title={url}
-                >
-                    {url}
-                </span>
+            {/*<div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800/60 pt-3 mt-auto">
                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md ${
                     trackingActive 
                         ? "bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300" 
@@ -76,7 +85,7 @@ export default function ShortLinkBody({ id, url, clickCount, trackingActive }: S
                         {trackingActive ? clickCount : "INAKTIV"}
                     </span>
                 </div>
-            </div>
+            </div>*/}
         </>
     );
 }

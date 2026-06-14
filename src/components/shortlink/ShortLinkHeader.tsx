@@ -2,18 +2,22 @@ import { Trash2 } from "lucide-react";
 
 type ShortLinkHeaderProps = {
     title: string;
+    url: string;
     createdAt: string;
     onDelete: () => void;
 };
 
-export default function ShortLinkHeader({ title, createdAt, onDelete }: ShortLinkHeaderProps) {
+export default function ShortLinkHeader({ title, url, createdAt, onDelete }: ShortLinkHeaderProps) {
     return (
         <div className="flex items-start justify-between gap-2 mb-4">
-            <div className="truncate">
+            <div className="truncate flex-1">
                 <h3 className="font-bold text-slate-900 dark:text-slate-50 truncate" title={title}>
                     {title}
                 </h3>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                <p className="text-xs text-slate-600 dark:text-slate-200 font-mono truncate mt-0.5" title={url}>
+                    {url}
+                </p>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 block mt-1">
                     Erstellt am {createdAt}
                 </span>
             </div>
