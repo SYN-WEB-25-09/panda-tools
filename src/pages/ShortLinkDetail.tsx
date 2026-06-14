@@ -77,7 +77,7 @@ export default function ShortLinkDetail() {
                 <p className="text-sm text-slate-500">
                     Short-Link wurde nicht gefunden.
                 </p>
-                <button onClick={() => navigate("/qrcodes")}
+                <button onClick={() => navigate("/short-links")}
                         className="mt-4 text-purple-600 text-sm font-semibold hover:underline">
                     Zurück zur Übersicht
                 </button>

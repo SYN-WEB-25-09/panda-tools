@@ -41,13 +41,22 @@ export default function ImageLibrary() {
         setUploading(true);
 
         try {
+            let runningTotalSize = currentSizeBytes;
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (!file.type.startsWith("image/")) continue;
 
                 const webpBlob = await processAndResizeImage(file);
 
+                if (runningTotalSize + webpBlob.size > MAX_TOTAL_SIZE_BYTES) {
+                    alert(`Speicherlimit erreicht! Das Bild "${file.name}" konnte nicht mehr hochgeladen werden, da die 100 MB Grenze überschritten wurde.`);
+                    break;
+                }
+
                 await uploadUserImage(user.uid, webpBlob);
+
+                runningTotalSize += webpBlob.size;
             }
 
             await loadLibrary();
