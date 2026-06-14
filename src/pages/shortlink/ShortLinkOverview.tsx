@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle, Link, Loader2, Plus, Search, X } from "lucide-react";
-import ShortLinkCard from "../components/shortlink/ShortLinkCard";
-import OverviewHeader from "../components/OverviewHeader";
-import { useFirebaseAuth } from "../context/FirebaseAuthContext"
-import { useShortLinksSearch, useDeleteShortLink } from "../hooks/useShortLink";
+import ShortLinkCard from "../../components/shortlink/ShortLinkCard";
+import OverviewHeader from "../../components/OverviewHeader";
+import { useFirebaseAuth } from "../../context/FirebaseAuthContext"
+import { useShortLinksSearch, useDeleteShortLink } from "../../hooks/useShortLink";
 
 export default function ShortLinkOverview() {
     const navigate = useNavigate();

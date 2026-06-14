@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles, Save, Loader2 } from "lucide-react";
 
-import GeneratorForm from "../components/qrcode/generator/form/GeneratorForm";
-import PreviewSidebar from "../components/qrcode/generator/preview/PreviewSidebar";
+import GeneratorForm from "../../components/qrcode/generator/form/GeneratorForm";
+import PreviewSidebar from "../../components/qrcode/generator/preview/PreviewSidebar";
 
-import { useFirebaseAuth } from "../context/FirebaseAuthContext";
-import { useUniqueId } from "../hooks/useUniqueId";
-import { useSaveQRCode } from "../hooks/useQRCode";
+import { useFirebaseAuth } from "../../context/FirebaseAuthContext";
+import { useUniqueId } from "../../hooks/useUniqueId";
+import { useSaveQRCode } from "../../hooks/useQRCode";
 
 export default function QRCodeGenerator() {
     const navigate = useNavigate();

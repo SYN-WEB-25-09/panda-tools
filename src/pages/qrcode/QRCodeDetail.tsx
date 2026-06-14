@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Smartphone, Compass, Globe, Laptop, Eye, Calendar, Cpu, Languages, Download, Check } from "lucide-react"
-import { fetchQRCodeById, fetchQRCodeAnalytics, QRCodeItem } from "../ts/qrcode";
-import { AdvancedDeviceInfo } from "../ts/redirect";
+import { fetchQRCodeById, fetchQRCodeAnalytics, QRCodeItem } from "../../ts/qrcode";
+import { AdvancedDeviceInfo } from "../../ts/redirect";
 import { QRCodeSVG } from "qrcode.react";
 
 export default function QRCodeDetail() {

@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles, Save, Loader2, Check, ExternalLink, Eye } from "lucide-react";
 
-import { useUniqueId } from "../hooks/useUniqueId";
-import { useSaveShortLink } from "../hooks/useShortLink";
-import { useFirebaseAuth } from "../context/FirebaseAuthContext";
+import { useUniqueId } from "../../hooks/useUniqueId";
+import { useSaveShortLink } from "../../hooks/useShortLink";
+import { useFirebaseAuth } from "../../context/FirebaseAuthContext";
 
 export default function ShortLinkGenerator() {
 

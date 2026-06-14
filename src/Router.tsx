@@ -1,13 +1,13 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home"
+import Dashboard from "./pages/Dashboard"
 import ImageLibrary from "./pages/ImageLibrary";
-import QRCodeOverview from "./pages/QRCodeOverview"
-import QRCodeDetail from "./pages/QRCodeDetail"
-import QRCodeGenerator from "./pages/QRCodeGenerator";
-import ShortLinkOverview from "./pages/ShortLinkOverview";
-import ShortLinkDetail from "./pages/ShortLinkDetail";
-import ShortLinkGenerator from "./pages/ShortLinkGenerator";
-import Redirect from "./components/Redirect";
+import QRCodeOverview from "./pages/qrcode/QRCodeOverview"
+import QRCodeDetail from "./pages/qrcode/QRCodeDetail"
+import QRCodeGenerator from "./pages/qrcode/QRCodeGenerator";
+import ShortLinkOverview from "./pages/shortlink/ShortLinkOverview";
+import ShortLinkDetail from "./pages/shortlink/ShortLinkDetail";
+import ShortLinkGenerator from "./pages/shortlink/ShortLinkGenerator";
+import Redirect from "./pages/Redirect";
 import NotFound from "./pages/NotFound";
 import FirebaseAuth from "./pages/FirebaseAuth"
 import UserManagement from "./components/firebase/UserManagement"
@@ -16,7 +16,7 @@ import ResetPassword from "./pages/ResetPassword";
 export default function Router() {
     return (
         <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/login" element={<FirebaseAuth />} />
             <Route path="/profile" element={<UserManagement />} />
             <Route path="/image-library" element={<ImageLibrary />} />

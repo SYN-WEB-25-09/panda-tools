@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { AlertCircle, Loader2, Plus, QrCode, Search, X } from "lucide-react"
-import QRCodeCard from "../components/qrcode/QRCodeCard"
-import OverviewHeader from "../components/OverviewHeader"
-import { useFirebaseAuth } from "../context/FirebaseAuthContext"
-import { useQRCodesSearch, useDeleteQRCode } from "../hooks/useQRCode";
+import QRCodeCard from "../../components/qrcode/QRCodeCard"
+import OverviewHeader from "../../components/OverviewHeader"
+import { useFirebaseAuth } from "../../context/FirebaseAuthContext"
+import { useQRCodesSearch, useDeleteQRCode } from "../../hooks/useQRCode";
 
 export default function QRCodeOverview() {
     const navigate = useNavigate();

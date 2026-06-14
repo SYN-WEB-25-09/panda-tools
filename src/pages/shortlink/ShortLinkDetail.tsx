@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Smartphone, Compass, Globe, Laptop, Eye, Calendar, Cpu, Languages, Copy, Check, ExternalLink } from "lucide-react";
-import { fetchShortLinkById, fetchShortLinkAnalytics, ShortLinkItem } from "../ts/shortlink";
-import { AdvancedDeviceInfo } from "../ts/redirect";
+import { fetchShortLinkById, fetchShortLinkAnalytics, ShortLinkItem } from "../../ts/shortlink";
+import { AdvancedDeviceInfo } from "../../ts/redirect";
 
 
 export default function ShortLinkDetail() {
