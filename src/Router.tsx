@@ -5,6 +5,7 @@ import QRCodeOverview from "./pages/QRCodeOverview"
 import QRCodeDetail from "./pages/QRCodeDetail"
 import QRCodeGenerator from "./pages/QRCodeGenerator";
 import ShortLinkOverview from "./pages/ShortLinkOverview";
+import ShortLinkDetail from "./pages/ShortLinkDetail";
 import ShortLinkGenerator from "./pages/ShortLinkGenerator";
 import Redirect from "./components/Redirect";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ export default function Router() {
             <Route path="/qrcodes/:id" element={<QRCodeDetail />} />
             <Route path="/qrcodes/new" element={<QRCodeGenerator />} />
             <Route path="/short-links" element={<ShortLinkOverview />} />
+            <Route path="/short-links/:id" element={<ShortLinkDetail />} />
             <Route path="/short-links/new" element={<ShortLinkGenerator />} />
             <Route path="/r/:id" element={<Redirect />} />
             <Route path="/reset-password" element={<ResetPassword />} />

@@ -17,10 +17,9 @@ export default function ShortLinkHeader({ title, createdAt, onDelete }: ShortLin
                     Erstellt am {createdAt}
                 </span>
             </div>
-            <button 
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete();
+            <button onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
                 }}
                 className="p-1.5 text-slate-400 hover:text-rose-600 dark:text-slate-600 dark:hover:text-rose-400 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                 title="Short-Link löschen"

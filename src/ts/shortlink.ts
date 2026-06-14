@@ -12,7 +12,7 @@ export type ShortLinkItem = {
     createdBy: string;
 }
 
-export async function fetchSortLinkAnalytics(id: string): Promise<AdvancedDeviceInfo[]> {
+export async function fetchShortLinkAnalytics(id: string): Promise<AdvancedDeviceInfo[]> {
     try {
         const analyticsSnapshot = await getDocs(collection(db, "shortlinks", id, "analytics"))
 
@@ -44,7 +44,7 @@ export async function fetchShortLinkById(id: string): Promise<ShortLinkItem | nu
     const data = docSnap.data();
     if (!data) return null;
 
-    const analytics = await fetchSortLinkAnalytics(id);
+    const analytics = await fetchShortLinkAnalytics(id);
 
     return {
         id: docSnap.id,
@@ -77,7 +77,7 @@ export async function fetchShortLinksByUserId(userId: string): Promise<ShortLink
     const shortLinks: ShortLinkItem[] = await Promise.all(
         querySnapshot.docs.map(async (docSnap) => {
             const data = docSnap.data();
-            const analytics = await fetchSortLinkAnalytics(docSnap.id);
+            const analytics = await fetchShortLinkAnalytics(docSnap.id);
 
             return {
                 id: docSnap.id,
