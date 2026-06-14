@@ -26,7 +26,7 @@ export default function Footer() {
 
                     <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
 
-                    <a href="https://www.twitch.tv/deinkanal"
+                    <a href="https://www.twitch.tv/glutarios"
                        target="_blank"
                        rel="noopener noreferrer"
                        className="text-slate-400 hover:text-[#9146FF] dark:text-slate-500 dark:hover:text-[#9146FF] transition-colors p-1"

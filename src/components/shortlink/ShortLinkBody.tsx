@@ -16,7 +16,7 @@ export default function ShortLinkBody({ id, url, clickCount, trackingActive }: S
         ? `${protocol}//${import.meta.env.VITE_IPV4}${port ? `:${port}` : ''}`
         : `${protocol}//${window.location.hostname}`;
 
-    const shortURL = `${baseUrl}/s/${id}`;
+    const shortURL = `${baseUrl}/r/${id}`;
 
     const handleCopy = async (e: React.MouseEvent) => {
         e.stopPropagation();
