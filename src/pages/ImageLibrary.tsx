@@ -4,6 +4,9 @@ import { fetchUserImages, processAndResizeImage, uploadUserImage, deleteUserImag
 import { UploadCloud, Trash2, ArrowLeft, Loader2, Image as ImageIcon } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
+const MAX_TOTAL_SIZE_MB = 100;
+const MAX_TOTAL_SIZE_BYTES = MAX_TOTAL_SIZE_MB * 1024 * 1024;
+
 export default function ImageLibrary() {
     const { user } = useFirebaseAuth();
     const navigate = useNavigate();
@@ -14,6 +17,10 @@ export default function ImageLibrary() {
     const [isDragActive, setIsDragActive] = useState<boolean>(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const currentCount = images.length;
+    const currentSizeBytes = images.reduce((sum, img) => sum + (img.size || 0), 0);
+    const currentSizeMB = currentSizeBytes / (1024 * 1024);
 
     const loadLibrary = async () => {
         if (!user) return;
@@ -102,12 +109,29 @@ export default function ImageLibrary() {
             </button>
 
             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" /> Bilder Library
-                </h2>
-                <p className="text-xs text-slate-500 mt-1">
-                    Deine Bilder werden automatisch auf maximal 1000x1000 Pixel herunterskaliert und als optimiertes WebP gespeichert.
-                </p>
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4" /> Bilder Library
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-1">
+                        Deine Bilder werden automatisch auf maximal 1000x1000 Pixel herunterskaliert und als optimiertes WebP gespeichert.
+                    </p>
+                </div>
+                
+                <div className="flex flex-col items-end text-right bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 rounded-xl p-3 min-w-48">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        Speicherplatz: <span className="text-purple-600 dark:text-purple-400">{currentSizeMB.toFixed(2)} MB</span> / {MAX_TOTAL_SIZE_MB} MB
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">
+                        Vorhandene Bilder: {currentCount}
+                    </span>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+                        <div 
+                            className={`h-full rounded-full transition-all ${currentSizeMB > (MAX_TOTAL_SIZE_MB * 0.9) ? 'bg-rose-500' : 'bg-purple-600'}`} 
+                            style={{ width: `${Math.min((currentSizeMB / MAX_TOTAL_SIZE_MB) * 100, 100)}%` }}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div onDragEnter={handleDrag}

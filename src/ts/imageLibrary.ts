@@ -1,9 +1,10 @@
-import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject } from "firebase/storage";
+import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject, getMetadata } from "firebase/storage";
 
 export type LibraryImage = {
     name: string;
     url: string;
     fullPath: string;
+    size: number;
 }
 
 export function processAndResizeImage(file: File): Promise<Blob> {
@@ -62,11 +63,16 @@ export async function fetchUserImages(userId: string): Promise<LibraryImage[]> {
     try {
         const res = await listAll(listRef);
         const imagePromises = res.items.map(async (item) => {
-            const url = await getDownloadURL(item);
+            const [url, metadata] = await Promise.all([
+                getDownloadURL(item),
+                getMetadata(item)
+            ]);
+
             return {
                 name: item.name,
                 url: url,
-                fullPath: item.fullPath
+                fullPath: item.fullPath,
+                size: metadata.size,
             };
         });
         return await Promise.all(imagePromises);
@@ -81,13 +87,14 @@ export async function uploadUserImage(userId: string, blob: Blob) {
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.webp`;
     const fileRef = ref(storage, `images/${userId}/${fileName}`);
 
-    await uploadBytes(fileRef, blob, { contentType: "image/webp" });
+    const uploadResult = await uploadBytes(fileRef, blob, { contentType: "image/webp" });
     const url = await getDownloadURL(fileRef);
 
     return {
         name: fileName,
         url: url,
-        fullPath: fileRef.fullPath
+        fullPath: fileRef.fullPath,
+        size: uploadResult.metadata.size,
     };
 }
 
