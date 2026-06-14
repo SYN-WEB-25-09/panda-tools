@@ -58,9 +58,23 @@ export default function QRCodeGenerator() {
             return;
         }
 
-        triggerSave({id: qrCodeId, userId: user.uid, title, baseUrl, bgColor, fgColor, image, imageSize, isTrackingEnabled, isTransparent, exportFormat, onSuccess: () => {
-            setIsSaved(true);
-        }})
+        triggerSave({
+            id: qrCodeId, 
+            userId: user.uid, 
+            title, 
+            baseUrl, 
+            bgColor, 
+            fgColor, 
+            image, 
+            imageSize, 
+            isTrackingEnabled, 
+            isTransparent, 
+            exportFormat, 
+            onSuccess: () => {
+                setIsSaved(true);
+                navigate(`/qrcodes/${qrCodeId}`);
+            }
+        })
     };
 
     const triggerDownload = (url: string, fileName: string) => {

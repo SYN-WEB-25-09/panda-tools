@@ -77,7 +77,7 @@ export default function ShortLinkDetail() {
                 <p className="text-sm text-slate-500">
                     Short-Link wurde nicht gefunden.
                 </p>
-                <button onClick={() => navigate(-1)}
+                <button onClick={() => navigate("/qrcodes")}
                         className="mt-4 text-purple-600 text-sm font-semibold hover:underline">
                     Zurück zur Übersicht
                 </button>
@@ -98,7 +98,7 @@ export default function ShortLinkDetail() {
 
     return (
         <div className="w-full max-w-5xl mx-auto py-6 px-4">
-            <button onClick={() => navigate(-1)}
+            <button onClick={() => navigate("/qrcodes")}
                     className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors mb-6 cursor-pointer group">
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" /> Zurück zur Übersicht
             </button>

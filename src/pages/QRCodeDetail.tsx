@@ -167,7 +167,7 @@ export default function QRCodeDetail() {
                 <p className="text-sm text-slate-500">
                     QR-Code wurde nicht gefunden.
                 </p>
-                <button onClick={() => navigate(-1)}
+                <button onClick={() => navigate("/qrcodes")}
                         className="mt-4 text-purple-600 text-sm font-semibold">
                     Zurück
                 </button>
@@ -178,7 +178,7 @@ export default function QRCodeDetail() {
     const getDistribution = (key: keyof AdvancedDeviceInfo) => {
         const counts: Record<string, number> = {};
         analytics.forEach(item => {
-            const val = item[key] ? String(item[key]) : "Unbeaknnt";
+            const val = item[key] ? String(item[key]) : "Unbekannt";
             counts[val] = (counts[val] || 0) + 1;
         });
         return Object.entries(counts).sort((a, b) => b[1] - a[1]);
@@ -189,7 +189,7 @@ export default function QRCodeDetail() {
     return (
         <div className="w-full max-w-5xl mx-auto py-6 px-4">
             <button 
-                onClick={() => navigate(-1)} 
+                onClick={() => navigate("/qrcodes")} 
                 className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors mb-6 cursor-pointer"
             >
                 <ArrowLeft className="w-4 h-4" /> Zurück zur Übersicht
